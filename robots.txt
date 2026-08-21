@@ -1,0 +1,5 @@
+# Allow everything, and point crawlers at the sitemap.
+User-agent: *
+Allow: /
+
+Sitemap: https://REPLACE-ME.example.com/sitemap.xml
