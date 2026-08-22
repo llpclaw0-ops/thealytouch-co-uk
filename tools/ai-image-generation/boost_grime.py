@@ -51,7 +51,9 @@ def resolve(name):
 # u = flat dulling across the cleaned surface, so it reads as "not cleaned"
 BOOST = {
     "floors":   dict(k=13.0, u=0.07),
-    "bathroom": dict(k=13.0, u=0.05),
+    # bathroom is NOT boosted - it is built by crevice_grime.py instead.
+    # Amplifying its generated dirt produced soft airbrushed charcoal clouds
+    # smeared across the toilet: the "AI slop" look. See crevice_grime.py.
     "bedroom":  dict(k=3.0, u=0.02),   # already reads clearly; barely touched
     "oven":     dict(k=15.0, u=0.13),
     "skirting": dict(k=9.0, u=0.05),

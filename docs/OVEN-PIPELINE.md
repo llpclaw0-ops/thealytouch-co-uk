@@ -129,3 +129,28 @@ floors crop moved up to the worktop (0.46-0.56) its band still ran to 0.85,
 leaving the cabinet doors below completely unchecked - which is precisely where
 the earlier scribbles-on-cupboards defect had appeared. Verified by injecting a
 smear at y=0.70 and confirming the check now fails on it.
+
+## The bathroom is built differently
+
+`crevice_grime.py`, not `boost_grime.py`. Amplifying the bathroom's generated
+dirt produced soft airbrushed charcoal clouds smeared across the toilet cistern
+and floating on the wooden wall - amorphous blobs that ignore the form of
+whatever they sit on. Sooty black on porcelain is not how a toilet gets dirty
+either.
+
+So the bathroom's grime is derived from the room's own geometry instead, with
+no model involved at all:
+
+- **crevice** - where a pixel is darker than its surroundings: grout lines,
+  silicone seams, the gaps between mosaic tiles. That is where water sits and
+  mould grows, and keying the dirt to it means the grime cannot float free of
+  the surface.
+- **settled** - a downward bias, because grime collects low and in corners.
+- **speckle** - fixed-seed noise, so it breaks up instead of reading as a wash.
+
+The other half matters more than it sounds: **this room is dark**. Black mosaic
+tiles mean darkening barely registers, so the "dirt only ever absorbs light"
+rule that is right for a pale floor is wrong here. What reads as filth in a
+dark bathroom is the opposite - pale limescale and soap scum, added toward
+white, in the same grout the mould follows, plus vertical streaks where water
+has run down the glass and dried.
