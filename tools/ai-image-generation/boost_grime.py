@@ -35,11 +35,11 @@ RAW = "/tmp/ai-raw"
 # k = how hard to amplify the generated grime
 # u = flat dulling across the cleaned surface, so it reads as "not cleaned"
 BOOST = {
-    "floors":   dict(k=7.0, u=0.05),
-    "bathroom": dict(k=7.0, u=0.06),
+    "floors":   dict(k=13.0, u=0.07),
+    "bathroom": dict(k=13.0, u=0.05),
     "bedroom":  dict(k=3.0, u=0.02),   # already reads clearly; barely touched
-    "oven":     dict(k=9.0, u=0.13),
-    "skirting": dict(k=7.0, u=0.05),
+    "oven":     dict(k=15.0, u=0.13),
+    "skirting": dict(k=9.0, u=0.05),
     "hoover":   dict(k=6.0, u=0.04),
 }
 

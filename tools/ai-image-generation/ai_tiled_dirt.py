@@ -21,17 +21,21 @@ TILE = 768
 
 JOBS = {
     "floors": dict(
-        crop=(0.00, 0.52, 1.00, 0.68),
-        prompt=("messy kitchen worktop surface with crumbs and spilled food on it, "
-                "sticky coffee ring stains and sauce splashes on the counter top, "
-                "greasy smears, unwiped dirty work surface, realistic photograph"),
-        strength=0.62),
+        # Was (0.00, 0.52, 1.00, 0.68), which sat mostly on the WHITE CABINET
+        # DOORS below the worktop - the grime came out as black scribbles on
+        # the cupboards with a hard horizontal cut-off. This lands on the
+        # wooden worktop run itself.
+        crop=(0.00, 0.46, 1.00, 0.56),
+        prompt=("greasy dirty kitchen worktop, crumbs and spilled food, sticky "
+                "coffee ring stains, sauce splashes, smeared grease on the "
+                "counter top, unwiped work surface, realistic photograph"),
+        strength=0.45),
     "bathroom": dict(
         crop=(0.00, 0.62, 1.00, 0.99),
         prompt=("filthy bathroom floor and lower wall tiles, heavy black mould staining the grout lines, dark grimy stains, "
                 "grey limescale and soap scum marks, water stains, grubby "
                 "unwashed tile surface, realistic photograph"),
-        strength=0.60),
+        strength=0.45),
     "oven": dict(
         # Cavity interior ONLY. The previous crop started at y=0.34 (282px) and
         # so contained the control panel at ~290-310px; at strength 0.92 SDXL
@@ -45,13 +49,16 @@ JOBS = {
         # filthy. It also rewrites the two fan discs on the back wall, so
         # the oven card needs oven_restore_fans.py afterwards - see
         # docs/OVEN-PIPELINE.md. Do not ship the output of this step alone.
-        strength=0.65),
+        strength=0.55),
     "skirting": dict(
         crop=(0.00, 0.60, 1.00, 1.00),
         prompt=("dusty dirty tiled floor, grey dust and fluff along the edges, "
                 "scuff marks, footprint smudges, dull unpolished dirty surface, "
                 "realistic photograph"),
-        strength=0.60),
+        # 0.60 redrew the tile layout itself - new seams, different marble, a
+        # visibly different floor between the two frames. Kept low so the tiles
+        # survive; boost_grime.py makes the grime read at card size.
+        strength=0.38),
     "bedroom": dict(
         crop=(0.00, 0.52, 0.74, 1.00),
         prompt=("messy unmade bed with rumpled crumpled bedding and twisted "
@@ -60,10 +67,12 @@ JOBS = {
         strength=0.62),
     "hoover": dict(
         crop=(0.00, 0.68, 1.00, 1.00),
-        prompt=("dirty stained cream carpet covered in scattered crumbs and bits of debris, "
-                "fluff and lint caught in the pile, faint dirty trodden marks, "
-                "carpet that needs vacuuming, realistic photograph"),
-        strength=0.64),
+        prompt=("cream carpet that needs vacuuming, scattered crumbs and small "
+                "bits of debris, fluff and lint caught in the pile, faint "
+                "trodden dirt marks, realistic photograph"),
+        # produced a heap that read as spilled plant soil, not a rug needing a hoover
+        neg=", soil, earth, mud, compost, dirt pile, spill, heap, black mass",
+        strength=0.45),
 }
 
 # CLIP truncates at 77 tokens. The full list ran to 99, so everything after
@@ -114,7 +123,8 @@ def run(name, cfg, pipe):
         # be regenerated identically.
         seed = (zlib.crc32(name.encode()) + i * 17) % 90000
         g = torch.Generator(device="cpu").manual_seed(seed)
-        out = pipe(prompt=cfg["prompt"], negative_prompt=NEG, image=work,
+        neg = NEG + cfg.get("neg", "")
+        out = pipe(prompt=cfg["prompt"], negative_prompt=neg, image=work,
                    strength=cfg["strength"], num_inference_steps=36,
                    guidance_scale=7.0, generator=g).images[0]
         out = out.resize((tw, th), Image.LANCZOS)
