@@ -11,7 +11,7 @@ aspect distortion at all), then reassemble with overlapping feathered blends.
 Each tile still contains only surface, so there are no fixtures to redraw, and
 each is geometrically undistorted so the model keeps the tile/grain structure.
 """
-import sys, torch, numpy as np
+import sys, zlib, torch, numpy as np
 from PIL import Image, ImageFilter
 from diffusers import StableDiffusionXLImg2ImgPipeline, DPMSolverMultistepScheduler
 
@@ -33,11 +33,19 @@ JOBS = {
                 "unwashed tile surface, realistic photograph"),
         strength=0.60),
     "oven": dict(
-        crop=(0.29, 0.34, 0.58, 0.66),
+        # Cavity interior ONLY. The previous crop started at y=0.34 (282px) and
+        # so contained the control panel at ~290-310px; at strength 0.92 SDXL
+        # duly invented a second row of knobs in the BEFORE frame only. A tile
+        # must contain no fixtures, which is the whole point of this tool.
+        crop=(0.30, 0.33, 0.70, 0.74),
         prompt=("filthy empty oven interior, thick black baked-on carbon crust on the "
                 "walls, heavy burnt grease, charred residue, blackened grimy wire "
                 "racks, no food inside, badly soiled oven, realistic photograph"),
-        strength=0.92),
+        # 0.65 is the only setting where the cavity reads as genuinely
+        # filthy. It also rewrites the two fan discs on the back wall, so
+        # the oven card needs oven_restore_fans.py afterwards - see
+        # docs/OVEN-PIPELINE.md. Do not ship the output of this step alone.
+        strength=0.65),
     "skirting": dict(
         crop=(0.00, 0.60, 1.00, 1.00),
         prompt=("dusty dirty tiled floor, grey dust and fluff along the edges, "
@@ -58,12 +66,14 @@ JOBS = {
         strength=0.64),
 }
 
+# CLIP truncates at 77 tokens. The full list ran to 99, so everything after
+# "damaged cabinets" was silently dropped and never had any effect. Trimmed
+# to the 75 tokens that were actually applied - same behaviour, no pretence.
 NEG = ("food, pie, bread, cake, tray, dish, plate, clean, spotless, shiny, "
        "people, hands, feet, furniture, wall, window, reflection, "
        "text, letters, numbers, watermark, logo, cartoon, illustration, cgi, "
        "render, 3d, abstract, pattern, distorted, warped, melted, smeared, "
-       "damaged cabinets, peeling paint, holes, rust, mould on wood, "
-       "liquid, glossy, blurry, out of focus, low quality")
+       "damaged cabinets")
 
 def feather_mask(w, h, edge):
     m = Image.new("L", (w, h), 0)
@@ -75,7 +85,7 @@ def feather_mask(w, h, edge):
     m = Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8), "L")
     return m.filter(ImageFilter.GaussianBlur(edge * 0.35))
 
-BASE_OVERRIDE = {"oven": "oven-base-nopie"}
+BASE_OVERRIDE = {"oven": "oven-openbase"}
 
 def run(name, cfg, pipe):
     src = BASE_OVERRIDE.get(name, f"{name}-base")
@@ -99,7 +109,11 @@ def run(name, cfg, pipe):
         tile = strip.crop((sx, 0, min(sx + win, sw), sh))
         tw, th = tile.size
         work = tile.resize((TILE, TILE), Image.LANCZOS)   # square in, square out
-        g = torch.Generator(device="cpu").manual_seed((abs(hash(name)) + i * 17) % 90000)
+        # zlib.crc32, not hash(): Python randomises string hashing per
+        # process, so the old seed differed on every run and no card could
+        # be regenerated identically.
+        seed = (zlib.crc32(name.encode()) + i * 17) % 90000
+        g = torch.Generator(device="cpu").manual_seed(seed)
         out = pipe(prompt=cfg["prompt"], negative_prompt=NEG, image=work,
                    strength=cfg["strength"], num_inference_steps=36,
                    guidance_scale=7.0, generator=g).images[0]

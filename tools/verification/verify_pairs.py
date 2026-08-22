@@ -29,13 +29,20 @@ ALLOWED = {
     "floors":   (0.45, 0.85),
     "bathroom": (0.60, 1.00),
     "bedroom":  (0.50, 1.00),
-    "oven":     (0.10, 0.95),
+    "oven":     (0.30, 0.78),   # cavity only; panel at ~0.11-0.26 must NOT change
     "skirting": (0.50, 1.00),
     "hoover":   (0.55, 1.00),
 }
 
 THRESH = 26          # per-channel delta counted as a real change
 LEAK_FRAC = 0.010    # >1% of outside pixels changed = fail
+
+# A fraction alone is far too blunt. The dirt is pasted only inside the crop,
+# so a correct pair changes EXACTLY 0 pixels outside the band - measured, all
+# six sit at 0. Against an outside area of ~900k px, a whole invented control
+# knob is only 0.2%, which sails under LEAK_FRAC. So cap the absolute count
+# too. 200 leaves room for stray JPEG noise while catching any real object.
+MAX_OUTSIDE_PX = 200
 
 def check(name):
     bp, ap = BA / f"{name}-before.jpg", BA / f"{name}-after.jpg"
@@ -64,10 +71,13 @@ def check(name):
     rows = np.where(changed.any(axis=1))[0]
     zone = (round(rows.min() / H, 2), round(rows.max() / H, 2)) if len(rows) else (0, 0)
 
-    ok = out_frac <= LEAK_FRAC and in_frac >= 0.02
+    out_px = int(outside.sum())
+    ok = (out_frac <= LEAK_FRAC and out_px <= MAX_OUTSIDE_PX and in_frac >= 0.02)
     why = []
     if out_frac > LEAK_FRAC:
         why.append(f"LEAK {out_frac*100:.1f}% of area outside dirt band changed")
+    if out_px > MAX_OUTSIDE_PX:
+        why.append(f"LEAK {out_px} px changed outside dirt band (max {MAX_OUTSIDE_PX})")
     if in_frac < 0.02:
         why.append(f"TOO SUBTLE only {in_frac*100:.1f}% of dirt band changed")
 
@@ -79,7 +89,7 @@ def check(name):
     Image.fromarray(arr).save(OUT / f"{name}-diff.png")
 
     return name, ok, ("; ".join(why) if why else
-                      f"clean: {in_frac*100:.0f}% dirt in band, {out_frac*100:.2f}% leak"), zone
+                      f"clean: {in_frac*100:.0f}% dirt in band, {out_px} px leak"), zone
 
 if __name__ == "__main__":
     names = sys.argv[1:] or CARDS
