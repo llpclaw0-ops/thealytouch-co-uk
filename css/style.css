@@ -506,14 +506,20 @@ p:last-child { margin-bottom: 0; }
   object-fit: cover;
   pointer-events: none;
 }
+/* Reveal the after image with clip-path rather than by shrinking a wrapper.
+
+   The previous approach sized the wrapper to --ba-pos and the image inside to
+   200% OF THAT WRAPPER, so the image rescaled and slid sideways during the
+   drag: it looked like a second photo being pushed in rather than one photo
+   being wiped across. Both layers now always fill the card at identical size
+   and position, and only the visible region is clipped, so the divider reads
+   as a single continuous image. */
 .ba__after-wrap {
-  --ba-width: 200%;
   position: absolute;
   inset: 0;
-  width: var(--ba-pos);
-  overflow: hidden;
+  clip-path: inset(0 calc(100% - var(--ba-pos)) 0 0);
 }
-.ba__after-wrap img { width: var(--ba-width); }
+.ba__after-wrap img { width: 100%; height: 100%; }
 .ba:focus-visible { outline: none; box-shadow: var(--focus); }
 
 .ba__label {

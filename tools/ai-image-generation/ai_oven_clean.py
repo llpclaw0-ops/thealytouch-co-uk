@@ -31,6 +31,8 @@ y0, y1 = (int(ys.min()), int(ys.max())) if len(ys) else (int(H*0.20), int(H*0.66
 # clamp to the cavity opening (exclude the lowered door apron at the bottom)
 x0 = max(x0, int(W*0.26)); x1 = min(x1, int(W*0.74))
 y0 = max(y0, int(H*0.16)); y1 = min(y1, int(H*0.62))
+# extend down over the lowered door apron so it is cleaned too
+y1 = min(int(H*0.80), y1 + int(H*0.16))
 print("clean mask box:", x0, y0, x1, y1)
 
 mask = Image.new("L", (W, H), 0)
@@ -38,12 +40,13 @@ ImageDraw.Draw(mask).rectangle([x0, y0, x1, y1], fill=255)
 mask = mask.filter(ImageFilter.GaussianBlur(10))
 mask.save(f"{RAW}/oven-clean-mask.png")
 
-CLEAN = ("the inside of an immaculate spotless clean oven cavity, gleaming pale "
+CLEAN = ("a built-in oven with its door hanging open and lowered flat, the inside "
+         "of the cavity immaculate and spotless, gleaming pale "
          "enamel interior walls, bright clean empty wire shelf racks, no grease, "
          "no burnt food, no black carbon, freshly deep cleaned, hygienic, like new, "
          "professional interior photograph, photorealistic, sharp focus")
-NEG = ("dirt, grease, grime, burnt, carbon, soot, black crust, food, bread, loaf, "
-       "tray, dish, baking, people, hands, text, letters, numbers, watermark, logo, "
+NEG = ("closed oven door, shut door, missing door, no door, dirt, grease, grime, burnt, carbon, soot, black crust, food, bread, loaf, "
+       "tray, dish, baking, people, hands, text, letters, numbers, digits, display, control panel, dials, knobs, screen, watermark, logo, "
        "cartoon, illustration, cgi, render, distorted, warped, blurry, low quality")
 
 print("loading inpaint...", flush=True)
@@ -55,7 +58,7 @@ pipe = pipe.to("mps"); pipe.set_progress_bar_config(disable=True)
 
 g = torch.Generator(device="cpu").manual_seed(5150)
 img = pipe(prompt=CLEAN, negative_prompt=NEG, image=src, mask_image=mask,
-           width=W, height=H, strength=0.97, num_inference_steps=40,
+           width=W, height=H, strength=0.62, num_inference_steps=40,
            guidance_scale=8.5, generator=g).images[0]
 img.save(f"{RAW}/oven-after.png")
 print("CLEAN OVEN DONE", flush=True)
