@@ -25,7 +25,10 @@ cp /tmp/ai-raw/oven-before.png /tmp/ai-raw/oven-dirty-layer.png
 # 3. put the two fan discs back, soiled  -> final before/after
 python3 tools/ai-image-generation/oven_restore_fans.py
 
-# 4. install + verify
+# 4. make the grime read at card size (all six cards use this)
+python3 tools/ai-image-generation/boost_grime.py
+
+# 5. install + verify
 python3 tools/ai-image-generation/install_ai.py oven
 python3 tools/verification/verify_pairs.py
 ```
@@ -90,3 +93,23 @@ cd /tmp/ai-raw && magick oven-before.png -resize 470x oven-after.png -resize 470
 ```
 
 `magick montage` fails on this machine ("unable to read font") - use `+append`.
+
+## Why boost_grime.py exists
+
+At card size five of the six pairs looked almost identical - the generated dirt
+was real but gentle, 3-5% of the band, which does not read as filth in a 470px
+card.
+
+Raising img2img strength does not fix it. At 0.72 the skirting floor's tile
+layout is redrawn - new seams, different marble - which breaks the requirement
+that both frames be the same image. Amplifying the raw signed difference does
+not work either: it turns the model's colour shifts into lurid teal patches and
+blown highlights.
+
+What works is amplifying only the *darkening*, in luminance, multiplied onto
+the clean pixel with a warm tint. Dirt absorbs light and is warm, so this can
+neither brighten nor shift hue, and the surface underneath stays exactly the
+surface. Dirt in band roughly doubled or tripled (skirting 4% -> 15%, hoover
+12% -> 23%) with every card still changing 0 pixels outside its crop.
+
+It always derives from `{card}-before-raw.png`, so re-running does not compound.
