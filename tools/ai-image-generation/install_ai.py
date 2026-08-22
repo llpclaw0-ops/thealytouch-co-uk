@@ -8,6 +8,7 @@ files and that both exist for every slot.
 import os, subprocess, sys, hashlib
 
 RAW = "/tmp/ai-raw"
+SRC = "/Users/llp/mums-cleaning-site/assets-source/ai-raw"
 OUT = "/Users/llp/mums-cleaning-site/img/ba"
 os.makedirs(OUT, exist_ok=True)
 W, H = 1600, 1067
@@ -25,9 +26,13 @@ def sha(p):
 
 for slot in only:
     for st in ("before", "after"):
-        src = f"{RAW}/{slot}-{st}.png"
-        if not os.path.exists(src):
-            print(f"MISSING {src}"); sys.exit(1)
+        # /tmp does not survive a reboot, so fall back to the copies kept in
+        # the repo - they are the artefacts of record for diffusion output
+        # that will not regenerate byte-for-byte.
+        src = next((p for p in (f"{RAW}/{slot}-{st}.png", f"{SRC}/{slot}-{st}.png")
+                    if os.path.exists(p)), None)
+        if src is None:
+            print(f"MISSING {slot}-{st}.png: looked in {RAW} and {SRC}"); sys.exit(1)
         dst = f"{OUT}/{slot}-{st}.jpg"
         run([src, "-resize", f"{W}x{H}^", "-gravity", "center",
              "-extent", f"{W}x{H}", "+repage",

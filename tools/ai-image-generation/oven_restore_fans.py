@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Put the two fan discs back, soiled, into the dirty cavity.
 
-img2img at 0.65 is the only setting that makes the cavity genuinely look
-filthy, but it rewrites the two fan discs on the back wall into pipework. The
+img2img strong enough to dirty the cavity also rewrites the two fan discs on
+the back wall into pipework. (The dirty layer now runs at 0.55, with
+boost_grime.py supplying the visibility, but the discs still go.) The
 discs are the single fragile detail in the frame, so rather than weaken the
 dirt to protect them, restore them afterwards: take their geometry from the
 clean base and darken them by the grime's own local tone, so they sit in the
@@ -39,7 +40,7 @@ def resolve(name):
     raise SystemExit(f"missing input {name}: looked in {RAW} and {SRC}")
 
 base  = Image.open(resolve("oven-openbase.png")).convert("RGB").resize((W, H), Image.LANCZOS)
-# The dirty layer from `ai_tiled_dirt.py oven` (strength 0.65).
+# The dirty layer from `ai_tiled_dirt.py oven`.
 dirty = Image.open(resolve("oven-dirty-layer.png")).convert("RGB").resize((W, H), Image.LANCZOS)
 
 B = np.asarray(base).astype(np.float32)

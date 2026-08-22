@@ -45,10 +45,10 @@ JOBS = {
         prompt=("filthy empty oven interior, thick black baked-on carbon crust on the "
                 "walls, heavy burnt grease, charred residue, blackened grimy wire "
                 "racks, no food inside, badly soiled oven, realistic photograph"),
-        # 0.65 is the only setting where the cavity reads as genuinely
-        # filthy. It also rewrites the two fan discs on the back wall, so
-        # the oven card needs oven_restore_fans.py afterwards - see
-        # docs/OVEN-PIPELINE.md. Do not ship the output of this step alone.
+        # Rewrites the two fan discs on the back wall into pipework at any
+        # strength that dirties the cavity, so the oven card needs
+        # oven_restore_fans.py afterwards - see docs/OVEN-PIPELINE.md.
+        # Do not ship the output of this step alone.
         strength=0.55),
     "skirting": dict(
         crop=(0.00, 0.60, 1.00, 1.00),

@@ -31,6 +31,21 @@ sys.path.insert(0, "/Users/llp/mums-cleaning-site/tools/ai-image-generation")
 from ai_tiled_dirt import JOBS, W, H, feather_mask
 
 RAW = "/tmp/ai-raw"
+SRC = "assets-source/ai-raw"
+
+
+def resolve(name):
+    """Prefer the working copy in /tmp, fall back to the copy kept in the repo.
+
+    /tmp does not survive a reboot, and these inputs are diffusion output that
+    will not regenerate byte-for-byte, so the repo copies are the artefacts of
+    record.
+    """
+    import os
+    for path in (f"{RAW}/{name}", f"{SRC}/{name}"):
+        if os.path.exists(path):
+            return path
+    raise SystemExit(f"missing input {name}: looked in {RAW} and {SRC}")
 
 # k = how hard to amplify the generated grime
 # u = flat dulling across the cleaned surface, so it reads as "not cleaned"
@@ -53,11 +68,14 @@ def boost(card):
     # Always derive from the pristine generated dirt, never from a previous
     # boost - otherwise re-running compounds the effect.
     import os, shutil
+    os.makedirs(RAW, exist_ok=True)
     raw = f"{RAW}/{card}-before-raw.png"
     if not os.path.exists(raw):
-        shutil.copy(f"{RAW}/{card}-before.png", raw)
+        shutil.copy(resolve(f"{card}-before-raw.png")
+                    if os.path.exists(f"{SRC}/{card}-before-raw.png")
+                    else resolve(f"{card}-before.png"), raw)
 
-    after  = Image.open(f"{RAW}/{card}-after.png").convert("RGB").resize((W, H), Image.LANCZOS)
+    after  = Image.open(resolve(f"{card}-after.png")).convert("RGB").resize((W, H), Image.LANCZOS)
     before = Image.open(raw).convert("RGB").resize((W, H), Image.LANCZOS)
     A = np.asarray(after).astype(np.float32)
     B = np.asarray(before).astype(np.float32)

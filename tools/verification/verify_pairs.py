@@ -13,7 +13,7 @@ A correct pair changes ONLY on the surface being cleaned. Anything else - a new
 chair, extra cabinet handles, a different table - shows up here as change in a
 region it has no business being in.
 """
-import sys, pathlib
+import re, sys, pathlib
 import numpy as np
 from PIL import Image, ImageChops
 
@@ -25,14 +25,32 @@ CARDS = ["floors", "bathroom", "bedroom", "oven", "skirting", "hoover"]
 
 # Where each card is ALLOWED to change, as fractions of height.
 # Everything outside this band must stay essentially identical.
-ALLOWED = {
-    "floors":   (0.45, 0.85),
-    "bathroom": (0.60, 1.00),
-    "bedroom":  (0.50, 1.00),
-    "oven":     (0.30, 0.78),   # cavity only; panel at ~0.11-0.26 must NOT change
-    "skirting": (0.50, 1.00),
-    "hoover":   (0.55, 1.00),
-}
+#
+# Derived from the crops in ai_tiled_dirt.py rather than kept by hand, because
+# the two drifted: after the floors crop moved to the worktop (0.46-0.56) its
+# band still ran to 0.85, leaving the cabinet doors below it unchecked - which
+# is exactly where a previous defect had appeared. Parsed with a regex instead
+# of imported so this stays free of torch/diffusers.
+MARGIN = 0.03          # feather bleed at the crop edges
+
+def _bands():
+    src = (pathlib.Path(__file__).resolve().parents[1]
+           / "ai-image-generation" / "ai_tiled_dirt.py").read_text()
+    out = {}
+    # Entries can carry comment lines between `dict(` and `crop=`, so scan
+    # forward from each card name rather than matching the whole block.
+    for m in re.finditer(r'"(\w+)": dict\(', src):
+        window = src[m.end():m.end() + 900]
+        c = re.search(r"crop=\(\s*([\d.]+),\s*([\d.]+),\s*([\d.]+),\s*([\d.]+)\s*\)", window)
+        if c:
+            y0, y1 = float(c.group(2)), float(c.group(4))
+            out[m.group(1)] = (max(0.0, y0 - MARGIN), min(1.0, y1 + MARGIN))
+    missing = [c for c in CARDS if c not in out]
+    if missing:
+        raise SystemExit(f"could not read crops for {missing} from ai_tiled_dirt.py")
+    return out
+
+ALLOWED = _bands()
 
 THRESH = 26          # per-channel delta counted as a real change
 LEAK_FRAC = 0.010    # >1% of outside pixels changed = fail

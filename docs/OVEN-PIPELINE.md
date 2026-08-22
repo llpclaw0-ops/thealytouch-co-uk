@@ -18,7 +18,7 @@ steps 3-4 alone rebuild the shipped image without step 1 or 2.
 python3 tools/ai-image-generation/ai_oven_open_base.py      # writes candidates
 #    pick one by eye -> /tmp/ai-raw/oven-openbase.png
 
-# 2. dirty layer: grime on the cavity, strength 0.65
+# 2. dirty layer: grime on the cavity (strength lives in ai_tiled_dirt.py)
 python3 tools/ai-image-generation/ai_tiled_dirt.py oven
 cp /tmp/ai-raw/oven-before.png /tmp/ai-raw/oven-dirty-layer.png
 
@@ -35,12 +35,15 @@ python3 tools/verification/verify_pairs.py
 
 ## Why step 3 exists
 
-Strength 0.65 is the only setting at which the cavity reads as genuinely
-filthy. Below it there is no visible dirt; at 0.75 and above the model starts
-inventing hardware. But even at 0.65 it rewrites the two fan discs on the back
-wall into pipework. Step 3 takes those discs back from the clean base and
-darkens them by the grime's own local tone, deterministically, so they cannot
-move or change shape.
+Any strength that actually dirties the cavity also rewrites the two fan discs
+on the back wall into pipework, and above ~0.75 the model invents hardware
+outright. Step 3 takes those discs back from the clean base and darkens them by
+the grime's own local tone, deterministically, so they cannot move or change
+shape.
+
+The dirty layer now runs gentler (0.55) than it once did, because
+`boost_grime.py` supplies the visibility - see below. That also cuts down the
+invented pipework the higher strength produced.
 
 ## Approaches that did not work
 
@@ -109,7 +112,20 @@ blown highlights.
 What works is amplifying only the *darkening*, in luminance, multiplied onto
 the clean pixel with a warm tint. Dirt absorbs light and is warm, so this can
 neither brighten nor shift hue, and the surface underneath stays exactly the
-surface. Dirt in band roughly doubled or tripled (skirting 4% -> 15%, hoover
-12% -> 23%) with every card still changing 0 pixels outside its crop.
+surface. Dirt in band is now floors 28%, bathroom 12%, bedroom 20%, oven 10%,
+skirting 23%, hoover 25%, with every card still changing 0 pixels outside its
+crop.
 
 It always derives from `{card}-before-raw.png`, so re-running does not compound.
+
+## Bands are derived, not hand-kept
+
+`verify_pairs.py` reads the crops straight out of `ai_tiled_dirt.py` (by regex,
+so it stays free of torch) and allows each card to change only within its crop
+plus a 0.03 margin.
+
+They used to be a separate hand-maintained dict, and it drifted: when the
+floors crop moved up to the worktop (0.46-0.56) its band still ran to 0.85,
+leaving the cabinet doors below completely unchecked - which is precisely where
+the earlier scribbles-on-cupboards defect had appeared. Verified by injecting a
+smear at y=0.70 and confirming the check now fails on it.
