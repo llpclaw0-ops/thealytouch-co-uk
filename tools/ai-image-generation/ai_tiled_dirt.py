@@ -31,10 +31,12 @@ JOBS = {
                 "counter top, unwiped work surface, realistic photograph"),
         strength=0.45),
     "bathroom": dict(
-        crop=(0.00, 0.62, 1.00, 0.99),
-        prompt=("filthy bathroom floor and lower wall tiles, heavy black mould staining the grout lines, dark grimy stains, "
-                "grey limescale and soap scum marks, water stains, grubby "
-                "unwashed tile surface, realistic photograph"),
+        # The bathroom no longer uses this img2img step at all - its BEFORE is
+        # built deterministically by crevice_grime.py. The crop is kept here
+        # because that tool and verify_pairs both read it from this table.
+        # Covers the shower tray, the lower wall tiles and the floor.
+        crop=(0.00, 0.55, 1.00, 1.00),
+        prompt=("unused - see crevice_grime.py"),
         strength=0.45),
     "oven": dict(
         # Cavity interior ONLY. The previous crop started at y=0.34 (282px) and

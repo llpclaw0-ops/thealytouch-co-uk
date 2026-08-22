@@ -33,16 +33,20 @@ SRC = "assets-source/ai-raw"
 
 CFG = {
     "bathroom": dict(
-        crevice=1.45,     # mould in the grout and seams
-        settled=0.30,     # grime collecting toward the floor
-        film=0.13,        # dull film over everything in the crop
-        porcelain=0.30,   # how much of that reaches bright smooth surfaces
-        tint=(1.0, 0.965, 0.90),
-        # This room is dark - black mosaic tiles - so darkening barely shows.
-        # What actually reads as filth here is the opposite: pale limescale and
-        # soap scum, which are LIGHTER than the surface they sit on.
-        lime=0.85,        # chalky deposits in the grout and around fittings
-        streak=0.48,      # dried water runs down the glass and tiles
+        # Tuned for a LIGHT room. The old plate was dim with black mosaic, so
+        # darkening was invisible and pale limescale had to carry everything.
+        # On cream tiles and a white tray it is the other way round: dark grime
+        # in the grout and around the tray edge reads instantly, and pale
+        # deposits barely show. So the dark terms lead and lime is kept small,
+        # just enough for dried water streaks on the glass.
+        crevice=0.95,
+        settled=0.45,
+        film=0.13,
+        porcelain=0.45,
+        tint=(1.0, 0.935, 0.855),
+        lime=0.12,
+        streak=0.20,
+        mottle=0.42,   # scum spread over the tray and floor, not just in lines
     ),
 }
 
@@ -86,8 +90,19 @@ def run(card):
     bright = np.clip((L - 120.0)/80.0, 0, 1)
     shield = 1.0 - (bright*smooth)*(1.0 - c["porcelain"])
 
+    # Soiling spread ACROSS surfaces, not only along lines. The crevice term
+    # alone traced dark outlines around the bath and vanity, because a strong
+    # object silhouette is "darker than its surroundings" too - it read as an
+    # edge-detect effect. Mottling is low-frequency noise laid on the flat
+    # areas between edges, which is what scum on a tray or floor looks like.
+    mot = np.asarray(Image.fromarray((rng.rand(H, W)*255).astype(np.uint8))
+                     .filter(ImageFilter.GaussianBlur(26))).astype(np.float32)/255.0
+    mot = np.clip((mot - 0.42) * 2.6, 0, 1)
+    mottle = c.get("mottle", 0.0) * mot * smooth * (0.35 + 0.65*low)
+
     amount = (c["crevice"]*crevice*speck
               + c["settled"]*low*crevice*2.0
+              + mottle
               + c["film"]*low) * region * shield
     amount = np.clip(amount, 0, 0.80)
 
