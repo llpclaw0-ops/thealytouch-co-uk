@@ -47,3 +47,33 @@ The AFTER is the untouched base image. The BEFORE is that same image with dirt
 generated only on the surface being cleaned. `tools/verification/verify_pairs.py`
 compares the two pixel by pixel and fails if anything meaningful changes
 outside the allowed band.
+
+## The bathroom card
+
+Same approach as the oven, and for a related reason. Text-to-image could not
+produce a usable bright bathroom: SDXL renders bathroom fixtures badly, and the
+candidates came back with two taps over one basin, a tap floating above bare
+counter with no bowl beneath it, and melted glassy drawer handles. Not
+shippable.
+
+| | |
+|---|---|
+| Title | "Free bathroom interior design image" |
+| Source | https://www.rawpixel.com/image/5919752/photo-image-public-domain-shadow-blue |
+| Licence | CC0 (public domain) |
+| Found via | Openverse API |
+| Used as | img2img composition reference, strength 0.45, seed 7 |
+| Kept at | `assets-source/ai-raw/bathroom-composition-ref.png` |
+
+The reference is not published on the site. It supplies coherent geometry that
+the model could not invent on its own; the published image is the img2img
+result.
+
+### Known weakness
+
+The composition is floor-heavy - the bath is a sliver at the left edge and the
+shower enclosure sits in the middle distance - so it reads more as a floor than
+as a bathroom. It was the best available: the free-licence pool for bathrooms
+is overwhelmingly amateur snapshots, dated suites and half-finished
+renovations. A properly licensed bathroom photograph would be a straight
+improvement, and swapping it in is a single base-image change.
