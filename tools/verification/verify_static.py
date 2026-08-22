@@ -74,11 +74,13 @@ print(f"[{'OK ' if not any('dead link' in f for f in fails) else 'FAIL'}] local 
 imgs = set()
 for p in pages:
     s = open(p).read()
-    imgs |= set(re.findall(r'src="([^"]+\.(?:jpg|png|svg|webp))"', s))
+    imgs |= set(re.findall(r'src="([^"]+\.(?:jpg|png|svg|webp)(?:\?v=[a-f0-9]+)?)"', s))
     for ss in re.findall(r'srcset="([^"]+)"', s):
         for part in ss.split(","):
             u = part.strip().split()[0]
             if u: imgs.add(u)
+# Strip the ?v= cache-bust stamp: what must exist is the file, not the URL.
+imgs = {i.split("?", 1)[0] for i in imgs}
 missing = [i for i in sorted(imgs) if not os.path.exists(i)]
 print(f"[{'OK ' if not missing else 'FAIL'}] {len(imgs)} referenced images, {len(missing)} missing")
 for m in missing: fails.append(f"missing image {m}")
