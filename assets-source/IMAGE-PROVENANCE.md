@@ -1,8 +1,8 @@
-# Where the before/after imagery comes from
+# Archived image-provenance note
 
-Every before/after image on the site is **AI-generated** (SDXL, run locally).
-None is a photograph of a customer's home or of a completed job, and the page
-says so next to the cards. Nothing here should ever be presented as a real job.
+This note describes retired imagery only and does not describe the assets
+currently published in `img/ba/`. See `BEFORE-AFTER-STOCK-SOURCES.md` for the
+current source and licence record.
 
 ## The oven card
 

@@ -32,6 +32,27 @@ RAW = "/tmp/ai-raw"
 SRC = "assets-source/ai-raw"
 
 CFG = {
+    "skirting": dict(
+        # Marble checkerboard. The grout grid is the whole story: ingrained
+        # dirt in the lines, dulling across the tile faces.
+        crevice=1.35, settled=0.55, film=0.10, porcelain=0.55,
+        mottle=0.50, lime=0.0, streak=0.0,
+        tint=(1.0, 0.955, 0.90),
+    ),
+    "hoover": dict(
+        # Cream carpet. No grout to work with, so mottling does the work -
+        # trodden dirt patches - with speckle reading as crumbs and lint.
+        crevice=0.55, settled=0.35, film=0.09, porcelain=0.75,
+        mottle=0.70, lime=0.0, streak=0.0,
+        tint=(1.0, 0.945, 0.875),
+    ),
+    "floors": dict(
+        # Wooden worktop. Grease smears and spills, heavier toward the join
+        # with the splashback where wiping misses.
+        crevice=0.90, settled=0.60, film=0.10, porcelain=0.60,
+        mottle=0.62, lime=0.0, streak=0.0,
+        tint=(1.0, 0.935, 0.855),
+    ),
     "bathroom": dict(
         # Tuned for a LIGHT room. The old plate was dim with black mosaic, so
         # darkening was invisible and pale limescale had to carry everything.
