@@ -6,11 +6,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=aly-touch-2026-08-20">
-<title>%SITE% — About</title>
+<link rel="stylesheet" href="css/style.css?v=5a880a10">
+<title>%SITE% — About the cleaner behind it</title>
 <meta name="description" content="About The Aly Touch — a small local cleaning service covering floors, bathrooms, beds, linen, ovens, skirtings and hoovering.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#fffaf2">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Aly Touch">
+<meta property="og:title" content="The Aly Touch — About The Aly Touch">
+<meta property="og:description" content="A small home cleaning service in Guernsey, run with care. A short list of tasks, done properly.">
+<meta property="og:image" content="img/the-aly-touch-logo.png?v=a9f5094c">
+<meta property="og:locale" content="en_GB">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -39,10 +46,24 @@
 <main id="main">
 <section class="section section--tight section--wash">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">About</span>
-      <h1>A small cleaning service, run with care</h1>
-      <p class="lede">The Aly Touch is a cleaning service for homes. The list of tasks is deliberately simple, so you always know exactly what is included.</p>
+    <div class="page-head">
+      <div class="section-head">
+        <span class="eyebrow">About</span>
+        <h1>A small cleaning service, run with care</h1>
+        <p class="lede">The Aly Touch is a cleaning service for homes across <span data-site="area">Guernsey</span>. The list of tasks is deliberately simple, so you always know exactly what is included.</p>
+      </div>
+      <div class="head-panel">
+        <h2>At a glance</h2>
+        <ul>
+          <li>Home cleaning across <span data-site="area">Guernsey</span>.</li>
+          <li>Everything on offer is listed on the services page.</li>
+          <li>Weekly, fortnightly, monthly or one-off visits.</li>
+          <li>A price for your home, agreed before booking.</li>
+        </ul>
+        <div class="head-panel__foot">
+          <a class="btn btn--light" data-href="phone" href="tel:07781446239"><span>Call</span><span data-site="phone">07781 446239</span></a>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -51,15 +72,24 @@
   <div class="wrap">
     <div class="split">
       <div>
-        <h2>What we do</h2>
-        <p>We clean floors and work surfaces, bathrooms and shower rooms, skirtings, and we polish and hoover. We also make beds, strip bedding and change bed linen, and we can clean ovens when you ask for it.</p>
-        <p>If a task is not on that list, we would rather say so than promise something we do not offer.</p>
-        <div class="btn-row" style="margin-top:24px">
+        <!-- DRAFT: written only from what the site already states, with nothing
+             invented. Aly should read it and change anything that is not how
+             she would put it. -->
+        <span class="eyebrow">In her own words</span>
+        <h2>Hello — I&rsquo;m Aly</h2>
+        <p>The Aly Touch is my cleaning service, and it is deliberately small. I clean homes across <span data-site="area">Guernsey</span>: floors and work surfaces, bathrooms and shower rooms, skirtings and polishing, hoovering, beds and linen. Ovens, fridges, cupboards, windows and limescale are there when you want them, and I take on bigger one-off jobs too &mdash; deep cleans, end of tenancy, after builders and holiday changeovers.</p>
+        <p>I would rather do a short list of jobs properly than a long list in a hurry. That is why the list on this site is the whole list. If something is not on it, I will say so rather than promise it and hope.</p>
+        <p>Every visit gets talked through first. You tell me which rooms matter most and how often you would like me, and we agree what the visit involves and what it will cost before anything is booked &mdash; no packages to fit into.</p>
+        <p>If that sounds like the help you are after, give me a ring.</p>
+        <div class="btn-row" style="margin-top:26px">
           <a class="btn btn--primary" href="services.html">See the full list</a>
+          <a class="btn btn--light" data-href="phone" href="tel:07781446239"><span>Call</span><span data-site="phone">07781 446239</span></a>
         </div>
       </div>
-      <div class="about-logo-panel">
-        <img src="img/the-aly-touch-logo.png?v=a9f5094c" alt="The Aly Touch cleaning services logo" width="1254" height="1254" loading="lazy" decoding="async">
+      <div data-about-media>
+        <div class="about-logo-panel">
+          <img src="img/the-aly-touch-logo.png?v=a9f5094c" alt="The Aly Touch cleaning services logo" width="1254" height="1254" loading="lazy" decoding="async">
+        </div>
       </div>
     </div>
   </div>
@@ -72,7 +102,7 @@
       <p>Tell us which rooms and tasks you would like looking after.</p>
       <div class="btn-row">
         <a class="btn btn--light" href="contact.html">Get a quote</a>
-        <a class="btn btn--ghost" data-href="phone" href="tel:07781446239">Call <span data-site="phone">07781 446239</span></a>
+        <a class="btn btn--ghost" data-href="phone" href="tel:07781446239"><span>Call</span><span data-site="phone">07781 446239</span></a>
       </div>
     </div>
   </div>
@@ -87,7 +117,8 @@
           <img class="logo__image" src="img/the-aly-touch-logo.png?v=a9f5094c" alt="The Aly Touch cleaning services logo" width="1254" height="1254">
           <span class="logo__text" data-site="name">The Aly Touch</span>
         </a>
-        <p data-site="tagline"></p>
+        <p class="footer-note" data-site="tagline"></p>
+        <a class="footer-contact" data-href="phone" href="tel:07781446239"><span>Call us</span><strong data-site="phone">07781 446239</strong></a>
       </div>
       <div>
         <h4>Pages</h4>
@@ -108,6 +139,10 @@
           <li><a href="services.html#ovens">Oven cleaning</a></li>
           <li><a href="services.html#skirtings">Skirtings &amp; polishing</a></li>
           <li><a href="services.html#hoovering">Hoovering / vacuuming</a></li>
+          <li><a href="services.html#windows">Windows</a></li>
+          <li><a href="services.html#deep">Deep &amp; one-off cleans</a></li>
+          <li><a href="services.html#tenancy">End of tenancy</a></li>
+          <li><a href="index.html#pricing">Pricing</a></li>
         </ul>
       </div>
       <div>
@@ -122,10 +157,10 @@
     </div>
     <div class="footer-bottom">
       <span>&copy; <span data-year>2026</span> <span data-site="name">The Aly Touch</span>. All rights reserved.</span>
-      <span>Home cleaning services</span>
+      <span>Home cleaning in <span data-site="area">Guernsey</span></span>
     </div>
   </div>
 </footer>
-<script src="js/site.js?v=aly-touch-2026-08-20"></script>
+<script src="js/site.js?v=27969091"></script>
 </body>
 </html>

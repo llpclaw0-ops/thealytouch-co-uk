@@ -9,8 +9,29 @@
 
 const SITE = {
   name:    "The Aly Touch",
-  tagline: "Cleaning for floors, work surfaces, bathrooms, shower rooms, beds, linen and ovens",
-  phone:   "07781 446239"
+  tagline: "Home cleaning, finishing touches like ovens, fridges and windows, and one-off jobs from deep cleans to end of tenancy",
+  phone:   "07781 446239",
+
+  // Where the service operates. Used in headings, the footer and the schema
+  // block, so changing it here changes it everywhere.
+  area:    "Guernsey",
+
+  // Headline rate. DELIBERATELY BLANK — the site does not publish a price.
+  // Put a figure here (e.g. "£35") and every price block switches back on;
+  // the copy around them is already written for it.
+  rate:    "",
+  rateNote: "The hours are estimated and agreed with you before anything is booked.",
+
+  // A real photo of Aly for the About page. Drop the file into img/ and put the
+  // path here (e.g. "img/aly.jpg"). Until it is set, the About page keeps the
+  // logo panel — it never shows a broken or empty frame.
+  portrait:     "",
+  portraitAlt:  "Aly, who runs The Aly Touch",
+  portraitName: "Aly",
+  portraitRole: "Owner, The Aly Touch",
+  // Add the approved secure form endpoint here after the business email and
+  // delivery service have been configured. Leave blank to keep delivery off.
+  quoteDelivery: { endpoint: "" }
 };
 
 /* --------------------------------------------------------------------------
@@ -31,6 +52,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (value === undefined) { el.remove(); return; }
     el.textContent = value;
   });
+
+  // Any element marked [data-needs="key"] disappears when that SITE value is
+  // blank. An unfinished-looking empty panel is worse than no panel.
+  document.querySelectorAll("[data-needs]").forEach(el => {
+    if (!SITE[el.dataset.needs]) el.remove();
+  });
+
+  // About page portrait. Swapped in only when SITE.portrait names a real file.
+  const aboutMedia = document.querySelector("[data-about-media]");
+  if (aboutMedia && SITE.portrait) {
+    aboutMedia.innerHTML =
+      '<figure class="portrait" style="margin:0">' +
+        '<img src="" alt="" width="1000" height="1250" loading="lazy" decoding="async">' +
+        '<figcaption class="portrait__caption"><strong></strong><span></span></figcaption>' +
+      '</figure>';
+    const img = aboutMedia.querySelector("img");
+    img.src = SITE.portrait;
+    img.alt = SITE.portraitAlt || "";
+    aboutMedia.querySelector("strong").textContent = SITE.portraitName || "";
+    aboutMedia.querySelector("span").textContent = SITE.portraitRole || "";
+  }
 
   // Telephone links. Digits only, no spaces, so the dialler gets a clean number.
   document.querySelectorAll('[data-href="phone"]').forEach(el => {
@@ -90,8 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const setPos = pct => {
       const p = Math.min(100, Math.max(0, pct));
       ba.style.setProperty("--ba-pos", p + "%");
-      // Counter-scale the clipped image so it does not squash as the wrap narrows.
-      wrap.style.setProperty("--ba-width", (p === 0 ? 100 : (100 / p) * 100) + "%");
       ba.setAttribute("aria-valuenow", Math.round(p));
     };
     const fromEvent = e => {
@@ -137,24 +177,155 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("scroll", toggleTopBtn, { passive: true });
   toggleTopBtn();
 
-  /* Enquiry form.
-     This does NOT send anything anywhere yet — it confirms on screen only.
-     To make it really send, point the <form> at a form service (Formspree,
-     Netlify Forms, Web3Forms) or your own endpoint, and delete this block. */
-  const form = document.querySelector("[data-demo-form]");
-  if (form) {
-    const status = form.querySelector(".form-status");
-    form.addEventListener("submit", e => {
+  // The Aly Touch quote flow deliberately stays on this page. Delivery remains
+  // inactive until SITE.quoteDelivery.endpoint is configured with an approved
+  // secure receiver; it never redirects to the separate Mrs Jones questionnaire.
+  const quoteForm = document.querySelector("[data-quote-form]");
+  if (quoteForm) {
+    const steps = [...quoteForm.querySelectorAll("[data-quote-step]")];
+    const stepLinks = [...quoteForm.querySelectorAll(".quote-flow__steps li")];
+    const progress = quoteForm.querySelector("[data-quote-progress]");
+    const back = quoteForm.querySelector("[data-quote-back]");
+    const next = quoteForm.querySelector("[data-quote-next]");
+    const submit = quoteForm.querySelector("[data-quote-submit]");
+    const status = quoteForm.querySelector("[data-quote-status]");
+    const serviceError = quoteForm.querySelector("[data-service-error]");
+    const summary = quoteForm.querySelector("[data-quote-summary]");
+    const labels = ["Your details", "Your clean", "Your routine", "Check your request"];
+    let current = 0;
+
+
+    /* ---------------------------------------------------------------- photos
+       Up to six pictures of the rooms. Held in memory as File objects and shown
+       as thumbnails; the native file input is never re-read, because picking a
+       second time would otherwise replace the first selection rather than add
+       to it. Object URLs are revoked on removal so the tab does not leak. */
+    const MAX_PHOTOS = 6;
+    const MAX_BYTES = 10 * 1024 * 1024;
+    const photoInput = quoteForm.querySelector("[data-photo-input]");
+    const photoList = quoteForm.querySelector("[data-photo-list]");
+    const photoCount = quoteForm.querySelector("[data-photo-count]");
+    let photos = [];
+
+    const describePhotos = extra => {
+      if (!photoCount) return;
+      const n = photos.length;
+      photoCount.textContent =
+        (n === 0 ? "No photos added yet." : `${n} photo${n === 1 ? "" : "s"} added${n >= MAX_PHOTOS ? " — that is the maximum" : ""}.`) +
+        (extra ? " " + extra : "");
+    };
+
+    const renderPhotos = extra => {
+      if (!photoList) return;
+      photoList.querySelectorAll("img").forEach(img => URL.revokeObjectURL(img.src));
+      photoList.innerHTML = "";
+      photos.forEach((file, index) => {
+        const item = document.createElement("li");
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        img.alt = "";
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "photo-remove";
+        remove.textContent = "Remove";
+        remove.setAttribute("aria-label", `Remove photo ${index + 1}, ${file.name}`);
+        remove.addEventListener("click", () => {
+          photos.splice(index, 1);
+          renderPhotos();
+        });
+        item.append(img, remove);
+        photoList.append(item);
+      });
+      describePhotos(extra);
+    };
+
+    if (photoInput) {
+      photoInput.addEventListener("change", () => {
+        const picked = [...photoInput.files];
+        const images = picked.filter(f => f.type.startsWith("image/"));
+        const small = images.filter(f => f.size <= MAX_BYTES);
+        const room = Math.max(0, MAX_PHOTOS - photos.length);
+        photos = photos.concat(small.slice(0, room));
+
+        const notes = [];
+        if (picked.length !== images.length) notes.push("Some files were not pictures and were skipped.");
+        if (images.length !== small.length) notes.push("Some pictures were over 10MB and were skipped.");
+        if (small.length > room) notes.push(`Only the first ${room} could be added.`);
+        // Clearing the input means choosing the same file again still fires change.
+        photoInput.value = "";
+        renderPhotos(notes.join(" "));
+      });
+      renderPhotos();
+    }
+
+    const selectedServices = () => [...quoteForm.querySelectorAll('input[name="service"]:checked')].map(input => input.value);
+    const showStep = index => {
+      current = index;
+      steps.forEach((step, i) => { step.hidden = i !== current; });
+      stepLinks.forEach((item, i) => { if (i === current) item.setAttribute("aria-current", "step"); else item.removeAttribute("aria-current"); });
+      progress.textContent = `Step ${current + 1} of 4: ${labels[current]}`;
+      back.hidden = current === 0;
+      next.hidden = current === steps.length - 1;
+      submit.hidden = current !== steps.length - 1;
+      status.hidden = true;
+      if (current === steps.length - 1) updateSummary();
+      const focusTarget = steps[current].querySelector("input, select, textarea");
+      if (focusTarget) focusTarget.focus({ preventScroll: true });
+    };
+    const validStep = () => {
+      const inputs = [...steps[current].querySelectorAll("input, select, textarea")];
+      if (current === 1 && selectedServices().length === 0) {
+        serviceError.hidden = false;
+        serviceError.textContent = "Please choose at least one task, or select Not sure yet.";
+        return false;
+      }
+      serviceError.hidden = true;
+      return inputs.every(input => input.checkValidity()) ? true : (steps[current].querySelector("input:invalid, select:invalid, textarea:invalid") || quoteForm).reportValidity();
+    };
+    const updateSummary = () => {
+      const value = name => (quoteForm.elements[name] && quoteForm.elements[name].value.trim()) || "Not provided";
+      const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
+      summary.innerHTML = rows.map(([term, detail]) => `<div><dt>${term}</dt><dd>${detail}</dd></div>`).join("");
+    };
+    next.addEventListener("click", () => { if (validStep()) showStep(current + 1); });
+    back.addEventListener("click", () => showStep(current - 1));
+    quoteForm.addEventListener("submit", async e => {
       e.preventDefault();
-      if (!form.reportValidity()) return;
-      const nameField = form.querySelector("#name");
-      const name = (nameField && nameField.value.trim()) || "";
+      if (!quoteForm.reportValidity()) return;
+      const endpoint = SITE.quoteDelivery && SITE.quoteDelivery.endpoint;
       status.hidden = false;
-      status.textContent = name
-        ? `Thanks ${name.split(" ")[0]} — this form is not connected yet, so nothing was sent. Please call ${SITE.phone} in the meantime.`
-        : `This form is not connected yet, so nothing was sent. Please call ${SITE.phone} in the meantime.`;
+      if (!endpoint) {
+        status.textContent = `Nothing has been sent — this form cannot deliver your details yet. Please call ${SITE.phone} and we will take it from there. Your answers are still above if you want to read them out.`;
+        status.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        return;
+      }
+      let request;
+      if (photos.length) {
+        const form = new FormData(quoteForm);
+        form.delete("photos");
+        form.delete("service");
+        selectedServices().forEach(v => form.append("services", v));
+        photos.forEach(file => form.append("photos", file, file.name));
+        // No Content-Type header: the browser sets the multipart boundary.
+        request = { method: "POST", body: form };
+      } else {
+        const payload = Object.fromEntries(new FormData(quoteForm).entries());
+        delete payload.photos;
+        payload.services = selectedServices();
+        request = { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) };
+      }
+      try {
+        const response = await fetch(endpoint, request);
+        if (!response.ok) throw new Error("Delivery unavailable");
+        status.textContent = "Thank you — your request has been sent. We will be in touch.";
+        quoteForm.reset();
+        photos = [];
+        renderPhotos();
+        showStep(0);
+      } catch (error) {
+        status.textContent = `Your request did not go through. Please call ${SITE.phone} and we will sort it out.`;
+      }
       status.scrollIntoView({ block: "nearest", behavior: "smooth" });
-      form.reset();
     });
   }
 });

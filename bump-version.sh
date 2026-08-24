@@ -14,7 +14,7 @@ def img_v(path):
     except OSError:
         return None
 
-IMG = re.compile(r'(img/[A-Za-z0-9_\-./]+\.(?:jpg|png|svg|webp))(\?v=[a-f0-9]+)?')
+IMG = re.compile(r'(img/[A-Za-z0-9_\-./]+\.(?:jpg|png|svg|webp))(\?v=[A-Za-z0-9_.\-]*)?')
 
 def stamp(m):
     v = img_v(m.group(1))
@@ -23,8 +23,8 @@ def stamp(m):
 n = 0
 for f in glob.glob("*.html"):
     s = open(f).read()
-    s = re.sub(r'href="css/style\.css(\?v=[a-f0-9]+)?"', f'href="css/style.css?v={css_v}"', s)
-    s = re.sub(r'src="js/site\.js(\?v=[a-f0-9]+)?"',   f'src="js/site.js?v={js_v}"', s)
+    s = re.sub(r'href="css/style\.css(\?v=[^"]*)?"', f'href="css/style.css?v={css_v}"', s)
+    s = re.sub(r'src="js/site\.js(\?v=[^"]*)?"',   f'src="js/site.js?v={js_v}"', s)
     s, k = IMG.subn(stamp, s)
     n += k
     open(f, "w").write(s)

@@ -34,7 +34,21 @@
   --maxw:       1180px;
   --gutter:     clamp(20px, 5vw, 44px);
   --focus:      0 0 0 3px var(--ivory), 0 0 0 6px var(--copper-dk);
+  --focus-ring: var(--copper-dk);
+
+  /* Aliases. The services and quote-flow rules were written against these
+     names; without them every property using one was silently dropped. */
+  --muted:      var(--ink-soft);
+  --cream:      var(--beige);
+  --serif:      var(--display);
+  --shadow-sm:  var(--shadow);
 }
+
+/* The hidden attribute must beat component display rules. Several buttons and
+   panels are toggled with [hidden]; .btn sets display:inline-flex, which won
+   the cascade and left the quote form showing Back, Continue and Finish at
+   once. */
+[hidden] { display: none !important; }
 
 *, *::before, *::after { box-sizing: border-box; }
 
@@ -58,7 +72,7 @@ body {
   overflow-x: hidden;
 }
 
-img { max-width: 100%; display: block; }
+img { max-width: 100%; height: auto; display: block; }
 
 a { color: var(--copper-dk); }
 a:hover { color: var(--navy); }
@@ -324,19 +338,32 @@ p:last-child { margin-bottom: 0; }
 }
 .hero__phone strong { font-size: 1.16rem; }
 .hero__phone:hover { border-color: var(--copper); }
-.hero__phone:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.hero__phone:focus-visible { outline: none; box-shadow: var(--focus); }
 
 /* Narrow screens: no room for the photo to breathe beside the copy, so make
    the wash near-opaque across the full width and stack to one column. */
 @media (max-width: 900px) {
   .hero__inner { grid-template-columns: 1fr; }
+  /* The full-size hero is ~350KB. Phones and small tablets get the resized
+     copies that already exist in img/sized/. */
   .hero {
     background-image:
       linear-gradient(180deg,
         rgba(255,250,242,.96) 0%,
         rgba(255,250,242,.92) 62%,
         rgba(244,234,223,.72) 100%),
-      url("../img/hero.jpg");
+      url("../img/sized/hero-900.jpg");
+  }
+}
+
+@media (max-width: 560px) {
+  .hero {
+    background-image:
+      linear-gradient(180deg,
+        rgba(255,250,242,.96) 0%,
+        rgba(255,250,242,.92) 62%,
+        rgba(244,234,223,.72) 100%),
+      url("../img/sized/hero-480.jpg");
   }
 }
 .hero__copy .lede, .hero__lede { color: var(--ink-soft); font-size: 1.12rem; }
@@ -686,6 +713,56 @@ p:last-child { margin-bottom: 0; }
   font-size: .95rem;
 }
 .checkbox input { width: 18px; height: 18px; accent-color: var(--navy); }
+
+/* On-page quote flow */
+.quote-flow { max-width: 760px; }
+.quote-flow__steps { list-style: none; padding: 0; margin: 0 0 18px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.quote-flow__steps li { color: var(--muted); font-size: .78rem; line-height: 1.2; font-weight: 700; display: grid; gap: 6px; }
+.quote-flow__steps span { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--cream); color: var(--navy); }
+.quote-flow__steps [aria-current="step"] { color: var(--navy); }
+.quote-flow__steps [aria-current="step"] span { background: var(--navy); color: #fff; }
+.quote-flow__progress { color: var(--muted); margin: 0 0 20px; font-weight: 600; }
+.quote-step { border: 0; padding: 0; margin: 0; min-width: 0; }
+.quote-step legend { color: var(--navy); font-family: var(--serif); font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 600; margin-bottom: 8px; }
+.quote-flow__actions { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+.quote-flow__actions [data-quote-next], .quote-flow__actions [data-quote-submit] { margin-left: auto; }
+.quote-summary { display: grid; gap: 10px; margin: 20px 0; }
+.quote-summary > div { display: grid; grid-template-columns: minmax(120px, .45fr) 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.quote-summary dt { font-weight: 700; color: var(--navy); }
+.quote-summary dd { margin: 0; overflow-wrap: anywhere; }
+.quote-consent { margin-top: 20px; }
+
+/* Services: curated, compact card rhythm */
+.service-group + .service-group { margin-top: 56px; }
+.service-group__intro { max-width: 620px; margin-bottom: 26px; }
+.service-group__intro .eyebrow { margin-bottom: 8px; }
+.service-group__intro h2 { margin: 0 0 8px; }
+.service-group__intro p { margin: 0; color: var(--muted); }
+.service-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px; }
+.service-card { border: 1px solid var(--line); background: #fff; border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-sm); }
+.service-card > img { display: block; width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+.service-card__body { padding: 20px; }
+.service-card h2, .service-card h3 { margin: 0 0 9px; font-size: 1.28rem; }
+.service-card p { margin: 0 0 16px; color: var(--muted); }
+.service-card .service-card__fit { color: var(--ink-soft); font-size: .9rem; margin-top: -6px; }
+.service-card a { color: var(--navy); font-weight: 700; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.service-quote { display: flex; align-items: center; justify-content: space-between; gap: 24px; background: var(--cream); padding: 24px; border-radius: var(--radius); margin: 40px 0; }
+.service-quote p { margin: 0; font-family: var(--serif); font-size: 1.3rem; color: var(--navy); }
+.service-steps { grid-template-columns: repeat(3, 1fr); }
+
+@media (max-width: 900px) { .service-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) {
+  .quote-flow__steps { gap: 5px; }
+  .quote-flow__steps li { font-size: .68rem; }
+  .quote-flow__steps span { width: 24px; height: 24px; }
+  .quote-flow__actions { align-items: stretch; }
+  .quote-flow__actions .btn { flex: 1; }
+  .quote-summary > div { grid-template-columns: 1fr; gap: 3px; }
+  .service-cards { grid-template-columns: 1fr; gap: 16px; }
+  .service-group + .service-group { margin-top: 42px; }
+  .service-quote { align-items: flex-start; flex-direction: column; margin: 30px 0; }
+  .service-steps { grid-template-columns: 1fr; }
+}
 .form-note { font-size: .9rem; color: var(--ink-soft); }
 .form-status {
   grid-column: 1 / -1;
@@ -805,3 +882,411 @@ p:last-child { margin-bottom: 0; }
   border-radius: 0 0 8px 0;
 }
 .skip-link:focus { left: 0; }
+
+/* ==========================================================================
+   Additions — pricing, reassurance, portrait, next steps
+   ========================================================================== */
+
+/* ---------------------------------------------------------- pricing ----- */
+
+.pricing {
+  display: grid;
+  grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: clamp(24px, 3.5vw, 48px);
+  align-items: stretch;
+}
+@media (max-width: 860px) { .pricing { grid-template-columns: 1fr; } }
+
+.pricing__figure {
+  background: var(--navy);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: clamp(28px, 3.4vw, 44px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  box-shadow: var(--shadow-lg);
+}
+.pricing__figure .eyebrow { color: #e6b98f; margin-bottom: 12px; }
+.pricing__figure .eyebrow::before { background: #e6b98f; }
+.pricing__amount {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  font-family: var(--display);
+  color: #fff;
+  line-height: 1;
+  margin: 4px 0 14px;
+}
+.pricing__amount b { font-size: clamp(3rem, 6.5vw, 4.4rem); font-weight: 600; letter-spacing: -.02em; }
+.pricing__amount span { font-size: 1.02rem; font-weight: 500; color: rgba(255,255,255,.82); font-family: var(--body); }
+.pricing__note { color: rgba(255,255,255,.82); font-size: .95rem; margin: 0; }
+.pricing__figure .btn-row { margin-top: 24px; }
+
+.pricing__detail {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(26px, 3.2vw, 40px);
+  box-shadow: var(--shadow);
+}
+.pricing__detail h3 { font-size: 1.3rem; margin-bottom: 14px; }
+.pricing__list { list-style: none; margin: 0 0 4px; padding: 0; display: grid; gap: 13px; }
+.pricing__list li {
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  gap: 12px;
+  align-items: start;
+  color: var(--ink-soft);
+  font-size: .99rem;
+}
+.pricing__list li::before {
+  content: "";
+  width: 20px; height: 20px;
+  margin-top: 3px;
+  border-radius: 50%;
+  background: var(--beige);
+  border: 1px solid var(--line);
+  background-image: linear-gradient(45deg, transparent 42%, var(--copper-dk) 42%, var(--copper-dk) 56%, transparent 56%);
+  background-size: 9px 2px;
+  background-repeat: no-repeat;
+  background-position: 5px 9px;
+}
+.pricing__list strong { color: var(--navy); font-weight: 650; }
+.pricing__small { margin-top: 18px; font-size: .89rem; color: var(--ink-soft); }
+
+/* ------------------------------------------------------ reassurance ----- */
+
+.assure {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(14px, 2vw, 22px);
+}
+@media (max-width: 900px) { .assure { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .assure { grid-template-columns: 1fr; } }
+
+.assure__item {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(20px, 2.4vw, 28px);
+  box-shadow: var(--shadow);
+}
+.assure__item h3 { font-size: 1.08rem; margin-bottom: 7px; }
+.assure__item p { margin: 0; color: var(--ink-soft); font-size: .95rem; }
+.assure__mark {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  background: var(--beige);
+  border: 1px solid var(--line);
+  display: grid; place-items: center;
+  margin-bottom: 15px;
+  color: var(--copper-dk);
+}
+.assure__mark svg { width: 20px; height: 20px; }
+
+/* --------------------------------------------------------- portrait ----- */
+
+.portrait {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--beige);
+  box-shadow: var(--shadow-lg);
+}
+.portrait > img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; }
+.portrait__caption {
+  background: var(--white);
+  border-top: 1px solid var(--line);
+  padding: 18px 22px;
+}
+.portrait__caption strong { display: block; color: var(--navy); font-family: var(--display); font-size: 1.16rem; }
+.portrait__caption span { font-size: .88rem; color: var(--ink-soft); }
+
+/* ------------------------------------------------------ next steps ------ */
+
+.next-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
+.next-steps li {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  gap: 14px;
+  align-items: start;
+  color: var(--ink-soft);
+  font-size: .96rem;
+}
+.next-steps li b { display: block; color: var(--navy); font-weight: 650; font-size: 1rem; margin-bottom: 2px; }
+.next-steps li::before {
+  content: counter(step);
+  counter-increment: step;
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  display: grid; place-items: center;
+  font-size: .84rem; font-weight: 700;
+  font-family: var(--body);
+}
+.next-steps { counter-reset: step; }
+
+/* -------------------------------------------------------- area chip ----- */
+
+.area-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 6px 14px 6px 10px;
+  font-size: .84rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+}
+.area-chip svg { width: 15px; height: 15px; color: var(--copper-dk); flex: none; }
+
+/* ------------------------------------------------------- refinements ---- */
+
+/* Was a dashed box, which reads as an unfinished dev note. */
+.ba-disclaimer {
+  margin-top: 22px;
+  font-size: .93rem;
+  color: var(--ink-soft);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--copper);
+  border-radius: var(--radius);
+  padding: 15px 20px;
+  max-width: 74ch;
+  margin-inline: auto;
+  text-align: center;
+}
+
+/* Match the rest of the card family rather than sitting at a tighter radius. */
+.service-card { border-radius: var(--radius-lg); }
+.service-card:hover { box-shadow: var(--shadow-lg); }
+.service-card { transition: box-shadow .16s ease, transform .16s ease; }
+.service-card:hover { transform: translateY(-3px); }
+
+.service-quote {
+  border: 1px solid var(--line);
+  padding: clamp(22px, 2.6vw, 30px) clamp(24px, 3vw, 34px);
+  border-radius: var(--radius-lg);
+}
+.service-quote .btn { flex: none; white-space: nowrap; }
+
+/* The quote flow's Back / Continue pair. */
+.quote-flow__steps li { color: var(--ink-soft); }
+.quote-flow__steps span { border: 1px solid var(--line); }
+.quote-flow__steps [aria-current="step"] span { border-color: var(--navy); }
+
+/* Buttons that pair a word with a phone number were rendering with the flex
+   gap on top of a trailing space. */
+
+
+.footer-note { max-width: 34ch; font-size: .93rem; color: rgba(255,255,255,.66); }
+
+/* Page intros that would otherwise leave half the row empty. */
+.page-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: clamp(28px, 4vw, 56px);
+  align-items: center;
+}
+@media (max-width: 900px) { .page-head { grid-template-columns: 1fr; } }
+.page-head .section-head { margin-bottom: 0; }
+
+.head-panel {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(24px, 3vw, 34px);
+  box-shadow: var(--shadow);
+}
+.head-panel h2 { font-size: 1.2rem; margin-bottom: 14px; }
+.head-panel ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+.head-panel > ul > li {
+  display: grid; grid-template-columns: 18px 1fr; gap: 11px;
+  align-items: start; color: var(--ink-soft); font-size: .96rem;
+}
+.head-panel > ul > li::before {
+  content: "";
+  width: 7px; height: 7px; margin-top: 9px; margin-left: 5px;
+  border-radius: 50%; background: var(--copper);
+}
+.head-panel__foot { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--line-soft); }
+
+
+/* Three steps across the full width. The old 2x2 grid beside a text column
+   left an empty cell and a tall gap under the button. */
+.steps--row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(18px, 2.4vw, 26px); }
+@media (max-width: 900px) { .steps--row { grid-template-columns: 1fr; } }
+.steps--row .step { padding: clamp(24px, 2.8vw, 32px); }
+
+/* The tick in front of each pricing point, drawn with borders so it never
+   depends on a font glyph. */
+.pricing__list li::before {
+  background: var(--beige);
+  background-image: none;
+  position: relative;
+}
+.pricing__list li { position: relative; }
+.pricing__list li::after {
+  content: "";
+  position: absolute;
+  left: 6px; top: 9px;
+  width: 8px; height: 4px;
+  border-left: 2px solid var(--copper-dk);
+  border-bottom: 2px solid var(--copper-dk);
+  transform: rotate(-45deg);
+}
+
+/* A quiet line of context, not a boxed notice. */
+.ba-disclaimer {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-top: 26px;
+  font-size: .95rem;
+}
+
+/* Footer: the brand column was the tallest but ended in white space. */
+.footer-contact {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-top: 20px;
+  padding: 12px 20px;
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: var(--radius);
+  text-decoration: none;
+}
+.footer-contact span {
+  font-size: .66rem; letter-spacing: .14em; text-transform: uppercase;
+  color: rgba(255,255,255,.62); font-weight: 700;
+}
+.footer-contact strong { color: #fff; font-size: 1.1rem; }
+.site-footer a.footer-contact:hover { text-decoration: none; border-color: rgba(255,255,255,.5); }
+
+
+/* The list items were grid containers, so a bare text node and an inline
+   <span> became two grid items and "Across Guernsey" split across two rows.
+   Use a marker and padding instead, which never splits inline content. */
+.head-panel > ul > li { display: block; padding-left: 18px; position: relative; }
+.head-panel > ul > li::before { position: absolute; left: 0; top: .62em; margin: 0; }
+
+/* Cards in a row are equal height, so the call to action should line up too. */
+.service-card { display: flex; flex-direction: column; }
+.service-card__body { display: flex; flex-direction: column; flex: 1; }
+.service-card__body > a { margin-top: auto; padding-top: 4px; }
+
+/* "Call" + number: the flex gap alone was reading as a double space. */
+.btn > span + span { margin-left: -3px; }
+
+/* Card titles were inheriting the full page-level h2 scale and swamping the
+   card. Cards carry their own, smaller heading step. */
+.card h2 { font-size: 1.42rem; line-height: 1.2; }
+.card .eyebrow { margin-bottom: 2px; }
+.card__media + .eyebrow { margin-top: 4px; }
+
+/* Pricing card without a figure: the lead line takes the place the number had. */
+.pricing__lead {
+  font-family: var(--display);
+  font-size: clamp(1.5rem, 2.6vw, 2rem);
+  line-height: 1.2;
+  color: #fff;
+  margin: 6px 0 14px;
+}
+
+/* Cards for services with no photograph of their own. Rather than borrow an
+   unrelated image, they carry a copper rule and more breathing room, so they
+   read as a deliberate second tier rather than a card with a missing picture. */
+.service-card--plain { border-top: 3px solid var(--copper); }
+.service-card--plain .service-card__body { padding: clamp(22px, 2.6vw, 28px); }
+.service-card--plain h3 { font-size: 1.34rem; }
+
+.service-cards--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 700px) { .service-cards--2 { grid-template-columns: 1fr; } }
+
+/* Add-on cards sit in their own row so they size against each other, not
+   against a photographed card three times their height. */
+.service-subhead {
+  margin: 26px 0 14px;
+  font-weight: 650;
+  color: var(--navy);
+  font-size: .95rem;
+}
+.service-cards--addons { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (max-width: 900px) { .service-cards--addons { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 700px) { .service-cards--addons { grid-template-columns: 1fr; } }
+
+/* --------------------------------------------------------- photo field ---- */
+
+.checkbox-heading {
+  margin: 20px 0 9px;
+  font-weight: 700;
+  font-size: .78rem;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--copper-dk);
+}
+.checkbox-heading:first-of-type { margin-top: 4px; }
+
+.photo-field {
+  margin-top: 26px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line-soft);
+}
+.photo-field h3 { font-size: 1.12rem; margin-bottom: 6px; }
+.photo-field .form-note { margin: 0 0 14px; }
+
+.photo-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  border: 1px dashed var(--copper);
+  background: var(--white);
+  color: var(--navy);
+  font-weight: 600;
+  cursor: pointer;
+}
+.photo-add:hover { border-style: solid; background: var(--beige); }
+.photo-add span { font-size: 1.1rem; color: var(--copper-dk); line-height: 1; }
+/* The native control is hidden but still focusable and still labelled. */
+.photo-add input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.photo-add:focus-within { box-shadow: var(--focus); }
+
+.photo-grid {
+  list-style: none;
+  margin: 14px 0 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 12px;
+}
+.photo-grid li {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--beige);
+}
+.photo-grid img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; }
+.photo-remove {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  border: 0;
+  background: rgba(7,24,45,.86);
+  color: #fff;
+  font: inherit;
+  font-size: .78rem;
+  font-weight: 600;
+  padding: 7px 0;
+  cursor: pointer;
+}
+.photo-remove:hover { background: var(--navy-deep); }
+.photo-caution { margin-top: 14px !important; font-size: .86rem; }
