@@ -317,15 +317,13 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(endpoint, request);
         if (!response.ok) throw new Error("Delivery unavailable");
-        status.textContent = "Thank you — your request has been sent. We will be in touch.";
-        quoteForm.reset();
-        photos = [];
-        renderPhotos();
-        showStep(0);
+        quoteForm.hidden = true;
+        const success = document.querySelector("[data-quote-success]");
+        if (success) { success.hidden = false; success.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
       } catch (error) {
         status.textContent = `Your request did not go through. Please call ${SITE.phone} and we will sort it out.`;
+        status.scrollIntoView({ block: "nearest", behavior: "smooth" });
       }
-      status.scrollIntoView({ block: "nearest", behavior: "smooth" });
     });
   }
 });
