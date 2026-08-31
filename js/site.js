@@ -31,7 +31,7 @@ const SITE = {
   portraitRole: "Owner, The Aly Touch",
   // Add the approved secure form endpoint here after the business email and
   // delivery service have been configured. Leave blank to keep delivery off.
-  quoteDelivery: { endpoint: "" }
+  quoteDelivery: { endpoint: "https://formsubmit.co/contact@thealytouch.co.uk" }
 };
 
 /* --------------------------------------------------------------------------
