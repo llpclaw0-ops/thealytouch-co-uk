@@ -298,7 +298,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextBtn = document.querySelector('[data-qz-next]');
   const submitBtn = document.querySelector('[data-qz-submit]');
   const errorEl = document.querySelector('[data-qz-error]');
-  const stepNames = ["Your details", "The clean", "Rooms & extras", "Access & photos", "Review"];
+  const stepNames = ["Your details", "The clean", "Rooms & extras", "Access", "Review"];
   let current = 0;
 
   // radio "choice" styling toggles
@@ -366,6 +366,45 @@ document.addEventListener('DOMContentLoaded', () => {
   nextBtn.addEventListener('click', () => { if (currentStepValid() && current < steps.length - 1) showStep(current + 1); });
   backBtn.addEventListener('click', () => { if (current > 0) showStep(current - 1); });
 
+  // Human-readable labels for the notification email. FormSubmit uses field
+  // names and raw option values verbatim, so both are translated here to
+  // match the readable labels used on the main site's contact form.
+  const FIELD_LABELS = {
+    name: 'Name',
+    postcode: 'Property postcode',
+    address: 'Property address',
+    contactMethod: 'Preferred contact method',
+    contactDetail: 'Contact number or email',
+    service: 'Type of clean',
+    propertyType: 'Property type',
+    bedrooms: 'Bedrooms',
+    bathrooms: 'Bathrooms / toilets',
+    condition: 'Current condition',
+    frequency: 'How often',
+    rooms: 'Rooms to clean',
+    addons: 'Extra jobs requested',
+    roomNotes: 'Anything to flag',
+    access: 'How the cleaner gets in',
+    parking: 'Parking',
+    pets: 'Pets at home',
+    contactTime: 'Best time to contact',
+    serviceConsent: 'Agreed to be contacted',
+    marketingConsent: 'Wants marketing updates'
+  };
+  const VALUE_LABELS = {
+    contactMethod: { phone: 'Phone call', text: 'Text message', whatsapp: 'WhatsApp', email: 'Email' },
+    service: { regular: 'Regular clean', deep: 'Deep / one-off spring clean', tenancy: 'End of tenancy, move in or out', builders: 'After builders', holiday: 'Holiday let changeover' },
+    propertyType: { house: 'House', flat: 'Flat', bungalow: 'Bungalow', other: 'Other' },
+    condition: { light: 'Lightly used', general: 'Needs a good general clean', heavy: 'Heavier build-up' },
+    frequency: { oneoff: 'One-off clean', weekly: 'Weekly', fortnightly: 'Every two weeks', monthly: 'Monthly' },
+    access: { home: 'Someone will be home', keySafe: 'Key safe (code later)', agent: 'Neighbour / agent', other: 'Other' },
+    parking: { free: 'Free parking', paid: 'Paid / permit parking', none: 'No nearby parking' },
+    pets: { no: 'No', yes: 'Yes' },
+    contactTime: { morning: 'Morning', afternoon: 'Afternoon', evening: 'Evening', anytime: 'Anytime' }
+  };
+  const labelKey = key => FIELD_LABELS[key] || key;
+  const labelValue = (key, value) => (VALUE_LABELS[key] && VALUE_LABELS[key][value]) || value;
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
     if (!currentStepValid()) return;
@@ -379,10 +418,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const payload = new FormData();
     for (const [key, value] of data.entries()) {
       if (key === 'rooms' || key === 'addons' || key === '_honey') continue;
-      payload.append(key, value);
+      payload.append(labelKey(key), labelValue(key, value));
     }
-    payload.append('rooms', rooms.join(', '));
-    payload.append('addons', addons.join(', '));
+    payload.append(labelKey('rooms'), rooms.join(', ') || 'None selected');
+    payload.append(labelKey('addons'), addons.join(', ') || 'None selected');
     payload.append('_subject', 'New enquiry - The Aly Touch quote quiz');
     payload.append('_captcha', 'false');
 
