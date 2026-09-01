@@ -367,29 +367,30 @@ document.addEventListener('DOMContentLoaded', () => {
   backBtn.addEventListener('click', () => { if (current > 0) showStep(current - 1); });
 
   // Human-readable labels for the notification email. FormSubmit uses field
-  // names and raw option values verbatim, so both are translated here to
-  // match the readable labels used on the main site's contact form.
+  // names and raw option values verbatim, and silently turns any space in a
+  // field name into an underscore, so hyphens are used instead of spaces
+  // here to match the labels used on the main site's contact form.
   const FIELD_LABELS = {
     name: 'Name',
-    postcode: 'Property postcode',
-    address: 'Property address',
-    contactMethod: 'Preferred contact method',
-    contactDetail: 'Contact number or email',
-    service: 'Type of clean',
-    propertyType: 'Property type',
+    postcode: 'Property-postcode',
+    address: 'Property-address',
+    contactMethod: 'Preferred-contact-method',
+    contactDetail: 'Contact-number-or-email',
+    service: 'Type-of-clean',
+    propertyType: 'Property-type',
     bedrooms: 'Bedrooms',
-    bathrooms: 'Bathrooms / toilets',
-    condition: 'Current condition',
-    frequency: 'How often',
-    rooms: 'Rooms to clean',
-    addons: 'Extra jobs requested',
-    roomNotes: 'Anything to flag',
-    access: 'How the cleaner gets in',
+    bathrooms: 'Bathrooms-toilets',
+    condition: 'Current-condition',
+    frequency: 'How-often',
+    rooms: 'Rooms-to-clean',
+    addons: 'Extra-jobs-requested',
+    roomNotes: 'Anything-to-flag',
+    access: 'How-the-cleaner-gets-in',
     parking: 'Parking',
-    pets: 'Pets at home',
-    contactTime: 'Best time to contact',
-    serviceConsent: 'Agreed to be contacted',
-    marketingConsent: 'Wants marketing updates'
+    pets: 'Pets-at-home',
+    contactTime: 'Best-time-to-contact',
+    serviceConsent: 'Agreed-to-be-contacted',
+    marketingConsent: 'Wants-marketing-updates'
   };
   const VALUE_LABELS = {
     contactMethod: { phone: 'Phone call', text: 'Text message', whatsapp: 'WhatsApp', email: 'Email' },
@@ -420,8 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (key === 'rooms' || key === 'addons' || key === '_honey') continue;
       payload.append(labelKey(key), labelValue(key, value));
     }
-    payload.append(labelKey('rooms'), rooms.join(', ') || 'None selected');
-    payload.append(labelKey('addons'), addons.join(', ') || 'None selected');
+    payload.append(labelKey('rooms'), rooms.join('\n') || 'None selected');
+    payload.append(labelKey('addons'), addons.join('\n') || 'None selected');
     payload.append('_subject', 'New enquiry - The Aly Touch quote quiz');
     payload.append('_captcha', 'false');
 

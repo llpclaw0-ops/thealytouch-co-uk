@@ -77,6 +77,15 @@
           <fieldset class="quote-step" data-quote-step>
             <legend>Your details</legend><p class="form-note">So we know how to get back to you.</p>
             <div class="form-grid"><div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required></div><div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div><div class="field field--full"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div></div>
+            <fieldset class="field field--full" style="border:0; padding:0; margin:14px 0 0;">
+              <legend style="font-weight:600; margin-bottom:6px;">How should we contact you?</legend>
+              <div class="checkbox-grid">
+                <label class="checkbox"><input type="radio" name="contactMethod" value="Phone call" checked><span>Phone call</span></label>
+                <label class="checkbox"><input type="radio" name="contactMethod" value="Text message"><span>Text message</span></label>
+                <label class="checkbox"><input type="radio" name="contactMethod" value="WhatsApp"><span>WhatsApp</span></label>
+                <label class="checkbox"><input type="radio" name="contactMethod" value="Email"><span>Email</span></label>
+              </div>
+            </fieldset>
           </fieldset>
           <fieldset class="quote-step" data-quote-step hidden>
             <legend>What would you like cleaned?</legend><p class="form-note">Choose all that apply. You can add anything else in your own words further on.</p>

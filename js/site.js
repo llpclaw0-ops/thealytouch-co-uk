@@ -284,24 +284,27 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     const updateSummary = () => {
       const value = name => (quoteForm.elements[name] && quoteForm.elements[name].value.trim()) || "Not provided";
-      const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
+      const contactMethodValue = () => { const el = quoteForm.querySelector('input[name="contactMethod"]:checked'); return el ? el.value : "Not provided"; };
+      const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Preferred contact method", contactMethodValue()], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
       summary.innerHTML = rows.map(([term, detail]) => `<div><dt>${term}</dt><dd>${detail}</dd></div>`).join("");
     };
     next.addEventListener("click", () => { if (validStep()) showStep(current + 1); });
     back.addEventListener("click", () => showStep(current - 1));
     // Human-readable labels for the notification email. FormSubmit uses the
-    // field name verbatim as the label, so payload keys are renamed here
-    // rather than in the form itself (the form's own field names are still
-    // used by validation and the on-page summary above).
+    // field name verbatim as the label and silently turns any space in a
+    // field name into an underscore, so hyphens are used instead of spaces
+    // here (the form's own field names are still used by validation and the
+    // on-page summary above; only the email's own labels are affected).
     const FIELD_LABELS = {
       name: "Name",
       phone: "Phone",
       email: "Email",
-      services: "Tasks selected",
-      frequency: "How often",
-      postcode: "Postcode or parish",
-      message: "Tell us about your place",
-      consent: "Agreed to be contacted"
+      contactMethod: "Preferred-contact-method",
+      services: "Tasks-selected",
+      frequency: "How-often",
+      postcode: "Postcode-or-parish",
+      message: "Tell-us-about-your-place",
+      consent: "Agreed-to-be-contacted"
     };
     const labelKey = key => FIELD_LABELS[key] || key;
 
@@ -330,7 +333,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const [key, value] of Object.entries(raw)) {
           form.append(labelKey(key), value);
         }
-        form.append(labelKey("services"), selectedServices().join(", ") || "Not provided");
+        form.append(labelKey("services"), selectedServices().join("\n") || "Not provided");
         photos.forEach(file => form.append("Photos", file, file.name));
         form.append("_subject", "New enquiry - The Aly Touch quote form");
         form.append("_captcha", "false");
@@ -344,7 +347,7 @@ document.addEventListener("DOMContentLoaded", () => {
         for (const [key, value] of Object.entries(raw)) {
           payload[labelKey(key)] = value;
         }
-        payload[labelKey("services")] = selectedServices();
+        payload[labelKey("services")] = selectedServices().join("\n") || "Not provided";
         payload._subject = "New enquiry - The Aly Touch quote form";
         payload._captcha = "false";
         request = { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload) };
