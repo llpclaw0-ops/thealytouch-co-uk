@@ -392,7 +392,10 @@ document.addEventListener('DOMContentLoaded', () => {
         headers: { 'Accept': 'application/json' },
         body: payload
       });
-      if (!response.ok) throw new Error('Delivery unavailable');
+      let result = null;
+      try { result = await response.json(); } catch (parseErr) { /* endpoint returned non-JSON; treat as failure below */ }
+      const delivered = response.ok && result && (result.success === true || result.success === 'true');
+      if (!delivered) throw new Error('Delivery unavailable');
       form.hidden = true;
       document.querySelector('[data-qz-success]').hidden = false;
       document.querySelector('[data-qz-progressbar]').parentElement.hidden = true;

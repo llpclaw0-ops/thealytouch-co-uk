@@ -31,7 +31,7 @@ const SITE = {
   portraitRole: "Owner, The Aly Touch",
   // Add the approved secure form endpoint here after the business email and
   // delivery service have been configured. Leave blank to keep delivery off.
-  quoteDelivery: { endpoint: "https://formsubmit.co/contact@thealytouch.co.uk" }
+  quoteDelivery: { endpoint: "https://formsubmit.co/ajax/contact@thealytouch.co.uk" }
 };
 
 /* --------------------------------------------------------------------------
@@ -306,17 +306,24 @@ document.addEventListener("DOMContentLoaded", () => {
         form.delete("service");
         selectedServices().forEach(v => form.append("services", v));
         photos.forEach(file => form.append("photos", file, file.name));
+        form.append("_subject", "New enquiry - The Aly Touch quote form");
+        form.append("_captcha", "false");
         // No Content-Type header: the browser sets the multipart boundary.
-        request = { method: "POST", body: form };
+        request = { method: "POST", headers: { "Accept": "application/json" }, body: form };
       } else {
         const payload = Object.fromEntries(new FormData(quoteForm).entries());
         delete payload.photos;
         payload.services = selectedServices();
-        request = { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) };
+        payload._subject = "New enquiry - The Aly Touch quote form";
+        payload._captcha = "false";
+        request = { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload) };
       }
       try {
         const response = await fetch(endpoint, request);
-        if (!response.ok) throw new Error("Delivery unavailable");
+        let result = null;
+        try { result = await response.json(); } catch (parseErr) { /* endpoint returned non-JSON; treat as failure below */ }
+        const delivered = response.ok && result && (result.success === true || result.success === "true");
+        if (!delivered) throw new Error("Delivery unavailable");
         quoteForm.hidden = true;
         const success = document.querySelector("[data-quote-success]");
         if (success) { success.hidden = false; success.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
