@@ -10,7 +10,7 @@ again.
 - Bathrooms & shower rooms
 - Beds & linen care
 
-## Finishing touches (ask for them on any visit)
+## Extra jobs (ask for them on any visit)
 - Oven cleaning
 - Inside fridges & cupboards
 - Windows — inside, and reachable outside

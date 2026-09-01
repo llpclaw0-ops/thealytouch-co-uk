@@ -9,7 +9,7 @@
 
 const SITE = {
   name:    "The Aly Touch",
-  tagline: "Home cleaning, finishing touches like ovens, fridges and windows, and one-off jobs from deep cleans to end of tenancy",
+  tagline: "Home cleaning, extra jobs like ovens, fridges and windows, and one-off jobs from deep cleans to end of tenancy",
   phone:   "07781 446239",
 
   // Where the service operates. Used in headings, the footer and the schema
@@ -289,6 +289,22 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     next.addEventListener("click", () => { if (validStep()) showStep(current + 1); });
     back.addEventListener("click", () => showStep(current - 1));
+    // Human-readable labels for the notification email. FormSubmit uses the
+    // field name verbatim as the label, so payload keys are renamed here
+    // rather than in the form itself (the form's own field names are still
+    // used by validation and the on-page summary above).
+    const FIELD_LABELS = {
+      name: "Name",
+      phone: "Phone",
+      email: "Email",
+      services: "Tasks selected",
+      frequency: "How often",
+      postcode: "Postcode or parish",
+      message: "Tell us about your place",
+      consent: "Agreed to be contacted"
+    };
+    const labelKey = key => FIELD_LABELS[key] || key;
+
     quoteForm.addEventListener("submit", async e => {
       e.preventDefault();
       if (!quoteForm.reportValidity()) return;
@@ -299,30 +315,51 @@ document.addEventListener("DOMContentLoaded", () => {
         status.scrollIntoView({ block: "nearest", behavior: "smooth" });
         return;
       }
+      // The AJAX endpoint (SITE.quoteDelivery.endpoint) does not deliver file
+      // attachments — FormSubmit only sends photos through its classic,
+      // non-AJAX endpoint. That endpoint returns an HTML page rather than
+      // JSON, so success is instead confirmed by checking its page text.
+      const classicEndpoint = endpoint.replace("/ajax/", "/");
+      const usingClassicEndpoint = photos.length > 0;
       let request;
       if (photos.length) {
-        const form = new FormData(quoteForm);
-        form.delete("photos");
-        form.delete("service");
-        selectedServices().forEach(v => form.append("services", v));
-        photos.forEach(file => form.append("photos", file, file.name));
+        const raw = Object.fromEntries(new FormData(quoteForm).entries());
+        delete raw.photos;
+        delete raw.service;
+        const form = new FormData();
+        for (const [key, value] of Object.entries(raw)) {
+          form.append(labelKey(key), value);
+        }
+        form.append(labelKey("services"), selectedServices().join(", ") || "Not provided");
+        photos.forEach(file => form.append("Photos", file, file.name));
         form.append("_subject", "New enquiry - The Aly Touch quote form");
         form.append("_captcha", "false");
         // No Content-Type header: the browser sets the multipart boundary.
-        request = { method: "POST", headers: { "Accept": "application/json" }, body: form };
+        request = { method: "POST", body: form };
       } else {
-        const payload = Object.fromEntries(new FormData(quoteForm).entries());
-        delete payload.photos;
-        payload.services = selectedServices();
+        const raw = Object.fromEntries(new FormData(quoteForm).entries());
+        delete raw.photos;
+        delete raw.service;
+        const payload = {};
+        for (const [key, value] of Object.entries(raw)) {
+          payload[labelKey(key)] = value;
+        }
+        payload[labelKey("services")] = selectedServices();
         payload._subject = "New enquiry - The Aly Touch quote form";
         payload._captcha = "false";
         request = { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload) };
       }
       try {
-        const response = await fetch(endpoint, request);
-        let result = null;
-        try { result = await response.json(); } catch (parseErr) { /* endpoint returned non-JSON; treat as failure below */ }
-        const delivered = response.ok && result && (result.success === true || result.success === "true");
+        const response = await fetch(usingClassicEndpoint ? classicEndpoint : endpoint, request);
+        let delivered;
+        if (usingClassicEndpoint) {
+          const text = await response.text();
+          delivered = response.ok && (text.includes("submitted successfully") || text.includes("Thanks!"));
+        } else {
+          let result = null;
+          try { result = await response.json(); } catch (parseErr) { /* endpoint returned non-JSON; treat as failure below */ }
+          delivered = response.ok && result && (result.success === true || result.success === "true");
+        }
         if (!delivered) throw new Error("Delivery unavailable");
         quoteForm.hidden = true;
         const success = document.querySelector("[data-quote-success]");
