@@ -21,3 +21,7 @@ The holiday-let card uses Pexels photo 14334049 by Augustinus Martinus Noppé (g
 ## Limescale photo replacement
 
 The limescale card now uses Hard Water Calcification by Bbypnda, colour-corrected by Veikk0.ma: https://commons.wikimedia.org/wiki/File:Hard_Water_Calcification.jpg under CC BY-SA 3.0. Responsive resized files limescale-v3*.jpg remain under that licence. Source, authors, licence and resizing/CSS cropping are disclosed on image-credits.html. No image-generation calls used.
+
+## Kitchen counter revision — 7 September 2026
+
+The floors comparison now uses `floors-before-v3` and `floors-after-v3` responsive JPEGs. Two user-approved OpenAI built-in edits raised the view of the existing generated kitchen and added removable crumbs, spills, sink residue and floor dirt to the matching before image. The pair remains labelled illustrative. Source PNGs and exact prompts are saved in the project’s `assets/revision-6/`. No stock photo or customer-job attribution is claimed.
