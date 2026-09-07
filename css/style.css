@@ -1293,3 +1293,12 @@ p:last-child { margin-bottom: 0; }
 
 .form-honeypot { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
 .quote-summary dd { overflow-wrap:anywhere; white-space:pre-wrap; }
+
+/* Service imagery shares the same comparison control as the homepage. */
+.service-card > .ba { border-radius:0; }
+.service-image-note { font-size:.88rem; color:var(--ink-soft); }
+.service-card--plain > img { aspect-ratio:4/3; object-fit:cover; }
+#fridges > img { object-position:center 45%; }
+
+/* Keep the mobile navigation call to action readable in every state. */
+.nav a.btn--primary, .nav a.btn--primary:hover, .nav a.btn--primary[aria-current="page"] { color: #fff; }
