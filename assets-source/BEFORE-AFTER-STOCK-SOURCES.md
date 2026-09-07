@@ -17,3 +17,7 @@ These images are illustrative, not evidence of The Aly Touch customer jobs. This
 Bathroom and skirting comparisons now pair the existing generated clean reference (`after-v2`) with a new deliberately stronger surface-dirt edit (`before-v3`). Geometry and lighting are retained for the comparison; these are illustrative images, not real job photographs. The fridge/cupboard card uses a new generated split composition showing BOTH interiors clean, with no before/after labels.
 
 The holiday-let card uses Pexels photo 14334049 by Augustinus Martinus Noppé (guest bed with towels). The limescale card uses Pexels photo 9462644 by Liliana Drew (detailed basin cleaning). Both have distinct files and source links on image-credits.html, under the Pexels licence. These supersede the two previously reused card images.
+
+## Limescale photo replacement
+
+The limescale card now uses Hard Water Calcification by Bbypnda, colour-corrected by Veikk0.ma: https://commons.wikimedia.org/wiki/File:Hard_Water_Calcification.jpg under CC BY-SA 3.0. Responsive resized files limescale-v3*.jpg remain under that licence. Source, authors, licence and resizing/CSS cropping are disclosed on image-credits.html. No image-generation calls used.
