@@ -1302,3 +1302,18 @@ p:last-child { margin-bottom: 0; }
 
 /* Keep the mobile navigation call to action readable in every state. */
 .nav a.btn--primary, .nav a.btn--primary:hover, .nav a.btn--primary[aria-current="page"] { color: #fff; }
+
+/* Keep navigation usable on short landscape screens and with enlarged text. */
+@media (max-width: 940px) {
+  .site-header .nav {
+    max-height: calc(100vh - 78px);
+    max-height: calc(100dvh - 78px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-bottom: max(20px, env(safe-area-inset-bottom));
+  }
+}
+@media (max-width: 700px) {
+  .service-card a { display: inline-flex; align-items: center; min-height: 44px; }
+  .footer-grid li a { display: inline-block; padding-block: 8px; }
+}
