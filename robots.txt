@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://REPLACE-ME.example.com/sitemap.xml
+Sitemap: https://thealytouch.co.uk/sitemap.xml

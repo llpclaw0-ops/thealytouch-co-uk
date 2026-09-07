@@ -8,7 +8,7 @@ again.
 ## Everyday room care
 - Floors & work surfaces
 - Bathrooms & shower rooms
-- Beds & linen care
+- Bed making & presentation — smooth existing bedding and arrange pillows. No stripping beds or changing linen (Lewis confirmed 7 September 2026).
 
 ## Extra jobs (ask for them on any visit)
 - Oven cleaning
