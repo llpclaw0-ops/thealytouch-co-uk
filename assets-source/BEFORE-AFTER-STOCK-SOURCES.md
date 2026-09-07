@@ -25,3 +25,7 @@ The limescale card now uses Hard Water Calcification by Bbypnda, colour-correcte
 ## Kitchen counter revision — 7 September 2026
 
 The floors comparison now uses `floors-before-v3` and `floors-after-v3` responsive JPEGs. Two user-approved OpenAI built-in edits raised the view of the existing generated kitchen and added removable crumbs, spills, sink residue and floor dirt to the matching before image. The pair remains labelled illustrative. Source PNGs and exact prompts are saved in the project’s `assets/revision-6/`. No stock photo or customer-job attribution is claimed.
+
+## Bedroom curtain revision — 7 September 2026
+
+One approved OpenAI built-in edit changed the existing bedroom before illustration to show half-drawn grey curtains. `bedroom-before-v2` responsive JPEGs replace the previous before images on Home and Services; the after image is unchanged. Original stock attribution remains on Image sources. Source PNG and exact prompt are in `assets/revision-7/`.
