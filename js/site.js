@@ -155,7 +155,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         { passive: false });
 
     ba.addEventListener("keydown", e => {
-      const now = parseFloat(ba.getAttribute("aria-valuenow")) || 50;
+      const now = Number(ba.getAttribute("aria-valuenow") ?? 50);
       if (e.key === "ArrowLeft")  { setPos(now - 5); e.preventDefault(); }
       if (e.key === "ArrowRight") { setPos(now + 5); e.preventDefault(); }
       if (e.key === "Home")       { setPos(0);   e.preventDefault(); }
@@ -193,6 +193,17 @@ document.addEventListener("DOMContentLoaded", () => {
     const summary = quoteForm.querySelector("[data-quote-summary]");
     const labels = ["Your details", "Your clean", "Your routine", "Check your request"];
     let current = 0;
+    let sending = false;
+    const syncContact = () => {
+      const emailChosen = quoteForm.elements.contactMethod.value === "Email";
+      quoteForm.elements.phone.required = !emailChosen;
+      quoteForm.elements.email.required = emailChosen;
+      quoteForm.querySelector('[data-phone-required]').textContent = emailChosen ? '(optional)' : '(required)';
+      quoteForm.querySelector('[data-email-required]').textContent = emailChosen ? '(required)' : '(optional)';
+    };
+    quoteForm.querySelectorAll('[name="contactMethod"]').forEach(input => input.addEventListener('change', syncContact));
+    syncContact();
+
 
 
     /* ---------------------------------------------------------------- photos
@@ -243,13 +254,18 @@ document.addEventListener("DOMContentLoaded", () => {
       photoInput.addEventListener("change", () => {
         const picked = [...photoInput.files];
         const images = picked.filter(f => f.type.startsWith("image/"));
-        const small = images.filter(f => f.size <= MAX_BYTES);
+        let total = photos.reduce((sum, file) => sum + file.size, 0);
+        const small = images.filter(f => {
+          if (total + f.size > MAX_BYTES) return false;
+          total += f.size;
+          return true;
+        });
         const room = Math.max(0, MAX_PHOTOS - photos.length);
         photos = photos.concat(small.slice(0, room));
 
         const notes = [];
         if (picked.length !== images.length) notes.push("Some files were not pictures and were skipped.");
-        if (images.length !== small.length) notes.push("Some pictures were over 10MB and were skipped.");
+        if (images.length !== small.length) notes.push("Some pictures would exceed the 10MB total limit and were skipped.");
         if (small.length > room) notes.push(`Only the first ${room} could be added.`);
         // Clearing the input means choosing the same file again still fires change.
         photoInput.value = "";
@@ -286,7 +302,14 @@ document.addEventListener("DOMContentLoaded", () => {
       const value = name => (quoteForm.elements[name] && quoteForm.elements[name].value.trim()) || "Not provided";
       const contactMethodValue = () => { const el = quoteForm.querySelector('input[name="contactMethod"]:checked'); return el ? el.value : "Not provided"; };
       const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Preferred contact method", contactMethodValue()], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
-      summary.innerHTML = rows.map(([term, detail]) => `<div><dt>${term}</dt><dd>${detail}</dd></div>`).join("");
+      summary.replaceChildren();
+      rows.forEach(([term, detail]) => {
+        const row = document.createElement('div');
+        const dt = document.createElement('dt');
+        const dd = document.createElement('dd');
+        dt.textContent = term; dd.textContent = detail;
+        row.append(dt, dd); summary.append(row);
+      });
     };
     next.addEventListener("click", () => { if (validStep()) showStep(current + 1); });
     back.addEventListener("click", () => showStep(current - 1));
@@ -310,67 +333,88 @@ document.addEventListener("DOMContentLoaded", () => {
 
     quoteForm.addEventListener("submit", async e => {
       e.preventDefault();
-      if (!quoteForm.reportValidity()) return;
-      const endpoint = SITE.quoteDelivery && SITE.quoteDelivery.endpoint;
-      status.hidden = false;
-      if (!endpoint) {
-        status.textContent = `Nothing has been sent — this form cannot deliver your details yet. Please call ${SITE.phone} and we will take it from there. Your answers are still above if you want to read them out.`;
-        status.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      if (sending) return;
+      if (current < steps.length - 1) {
+        if (validStep()) showStep(current + 1);
         return;
       }
-      // The AJAX endpoint (SITE.quoteDelivery.endpoint) does not deliver file
-      // attachments — FormSubmit only sends photos through its classic,
-      // non-AJAX endpoint. That endpoint returns an HTML page rather than
-      // JSON, so success is instead confirmed by checking its page text.
-      const classicEndpoint = endpoint.replace("/ajax/", "/");
-      const usingClassicEndpoint = photos.length > 0;
-      let request;
-      if (photos.length) {
-        const raw = Object.fromEntries(new FormData(quoteForm).entries());
-        delete raw.photos;
-        delete raw.service;
-        const form = new FormData();
-        for (const [key, value] of Object.entries(raw)) {
-          form.append(labelKey(key), value);
-        }
-        form.append(labelKey("services"), selectedServices().join("\n") || "Not provided");
-        photos.forEach(file => form.append("Photos", file, file.name));
-        form.append("_subject", "New enquiry - The Aly Touch quote form");
-        form.append("_captcha", "false");
-        // No Content-Type header: the browser sets the multipart boundary.
-        request = { method: "POST", body: form };
-      } else {
-        const raw = Object.fromEntries(new FormData(quoteForm).entries());
-        delete raw.photos;
-        delete raw.service;
-        const payload = {};
-        for (const [key, value] of Object.entries(raw)) {
-          payload[labelKey(key)] = value;
-        }
-        payload[labelKey("services")] = selectedServices().join("\n") || "Not provided";
-        payload._subject = "New enquiry - The Aly Touch quote form";
-        payload._captcha = "false";
-        request = { method: "POST", headers: { "Content-Type": "application/json", "Accept": "application/json" }, body: JSON.stringify(payload) };
+      if (quoteForm.elements._honey.value) return;
+      for (let i = 0; i < steps.length; i++) {
+        const invalid = steps[i].querySelector('input:invalid, select:invalid, textarea:invalid');
+        if (invalid) { showStep(i); invalid.reportValidity(); return; }
       }
-      try {
-        const response = await fetch(usingClassicEndpoint ? classicEndpoint : endpoint, request);
-        let delivered;
-        if (usingClassicEndpoint) {
-          const text = await response.text();
-          delivered = response.ok && (text.includes("submitted successfully") || text.includes("Thanks!"));
-        } else {
-          let result = null;
-          try { result = await response.json(); } catch (parseErr) { /* endpoint returned non-JSON; treat as failure below */ }
-          delivered = response.ok && result && (result.success === true || result.success === "true");
+      if (!selectedServices().length) { showStep(1); validStep(); return; }
+      const endpoint = SITE.quoteDelivery && SITE.quoteDelivery.endpoint;
+      status.hidden = false;
+      if (!endpoint) { status.textContent = `Please call ${SITE.phone} to send your enquiry.`; return; }
+      sending = true;
+      submit.disabled = true; next.disabled = true; back.disabled = true;
+      submit.textContent = 'Sending…';
+      quoteForm.setAttribute('aria-busy', 'true');
+      status.textContent = 'Sending your enquiry…';
+      const raw = Object.fromEntries(new FormData(quoteForm).entries());
+      delete raw.photos; delete raw.service;
+      const payload = {};
+      for (const [key, value] of Object.entries(raw)) payload[labelKey(key)] = value;
+      payload[labelKey('services')] = selectedServices().join('\n');
+      payload._subject = 'New enquiry - The Aly Touch quote form';
+      payload._captcha = 'false';
+      payload._template = 'table';
+      if (raw.email) payload._replyto = raw.email;
+
+      if (photos.length) {
+        try {
+        // FormSubmit documents native multipart submission for attachments.
+        // Do not fetch its HTML page cross-origin or infer success from page text.
+        const delivery = document.createElement('form');
+        delivery.method = 'POST'; delivery.action = endpoint.replace('/ajax/', '/');
+        delivery.enctype = 'multipart/form-data'; delivery.hidden = true;
+        payload._next = 'https://thealytouch.co.uk/thank-you.html';
+        Object.entries(payload).forEach(([name, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden'; input.name = name; input.value = value;
+          delivery.append(input);
+        });
+        photos.forEach((file, index) => {
+          const input = document.createElement('input');
+          input.type = 'file'; input.name = index ? `attachment${index + 1}` : 'attachment';
+          const transfer = new DataTransfer(); transfer.items.add(file); input.files = transfer.files;
+          delivery.append(input);
+        });
+        document.body.append(delivery);
+        status.textContent = 'Opening our form delivery service to send your enquiry and photos…';
+        delivery.submit();
+        } catch (error) {
+          status.textContent = `Your browser could not prepare the photos. Remove them to send the enquiry, or call ${SITE.phone}. Your answers are still here.`;
+          sending = false; submit.disabled = false; next.disabled = false; back.disabled = false;
+          submit.textContent = 'Send my enquiry'; quoteForm.removeAttribute('aria-busy');
         }
-        if (!delivered) throw new Error("Delivery unavailable");
+        return;
+      }
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch(endpoint, {
+          method: 'POST', headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(payload), signal: controller.signal
+        });
+        const result = await response.json();
+        if (!response.ok || !(result.success === true || result.success === 'true')) throw new Error('Delivery unavailable');
         quoteForm.hidden = true;
-        const success = document.querySelector("[data-quote-success]");
-        if (success) { success.hidden = false; success.scrollIntoView({ block: "nearest", behavior: "smooth" }); }
+        const success = document.querySelector('[data-quote-success]');
+        if (success) {
+          success.hidden = false; success.tabIndex = -1; success.focus();
+          success.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        }
       } catch (error) {
-        status.textContent = `Your request did not go through. Please call ${SITE.phone} and we will sort it out.`;
-        status.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        status.textContent = `We could not confirm your enquiry was sent. Your answers are still here. Please call ${SITE.phone} before retrying if you are unsure.`;
+        status.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      } finally {
+        clearTimeout(timeout); sending = false;
+        submit.disabled = false; next.disabled = false; back.disabled = false;
+        submit.textContent = 'Send my enquiry'; quoteForm.removeAttribute('aria-busy');
       }
     });
+    showStep(0);
   }
 });

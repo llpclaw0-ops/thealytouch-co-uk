@@ -1290,3 +1290,6 @@ p:last-child { margin-bottom: 0; }
 }
 .photo-remove:hover { background: var(--navy-deep); }
 .photo-caution { margin-top: 14px !important; font-size: .86rem; }
+
+.form-honeypot { position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden; }
+.quote-summary dd { overflow-wrap:anywhere; white-space:pre-wrap; }

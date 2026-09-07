@@ -6,8 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@400;500;600;650;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=5a880a10">
-<title>%SITE% — Get a cleaning quote in Guernsey</title>
+<link rel="stylesheet" href="css/style.css?v=bf6b6670">
+<title>The Aly Touch — Get a cleaning quote in Guernsey</title>
 <meta name="description" content="Contact The Aly Touch for cleaning in Guernsey: everyday room care, ovens, fridges, windows, limescale, and one-off jobs including deep cleans and end of tenancy.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#fffaf2">
@@ -15,9 +15,11 @@
 <meta property="og:site_name" content="The Aly Touch">
 <meta property="og:title" content="The Aly Touch — Get a cleaning quote in Guernsey">
 <meta property="og:description" content="Tell us which rooms and tasks you need looking after, or call 07781 446239.">
-<meta property="og:image" content="img/the-aly-touch-logo.png?v=a9f5094c">
+<meta property="og:image" content="https://thealytouch.co.uk/img/the-aly-touch-logo.png?v=a9f5094c">
 <meta property="og:locale" content="en_GB">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://thealytouch.co.uk/contact.html">
+<meta property="og:url" content="https://thealytouch.co.uk/contact.html">
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -72,11 +74,12 @@
         <p>Four short steps, all on this page. You can go back at any point. If you would rather not fill anything in, calling is just as good.</p>
         <noscript><p class="form-status">This step-by-step form needs JavaScript, which is switched off in your browser. Please call <span data-site="phone">07781 446239</span> instead and we will take your details over the phone.</p></noscript>
         <form class="quote-flow" style="margin-top:22px" data-quote-form novalidate>
+          <input type="text" name="_honey" class="form-honeypot" tabindex="-1" autocomplete="off" aria-hidden="true">
           <ol class="quote-flow__steps" aria-label="Quote progress"><li aria-current="step"><span>1</span>Your details</li><li><span>2</span>Your clean</li><li><span>3</span>Your routine</li><li><span>4</span>Check</li></ol>
           <p class="quote-flow__progress" data-quote-progress aria-live="polite">Step 1 of 4: Your details</p>
           <fieldset class="quote-step" data-quote-step>
-            <legend>Your details</legend><p class="form-note">So we know how to get back to you.</p>
-            <div class="form-grid"><div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required></div><div class="field"><label for="phone">Phone</label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div><div class="field field--full"><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" required></div></div>
+            <legend>Your details</legend><p class="form-note">Choose how you would like us to reply. You only need to provide the phone number or email address for that choice.</p>
+            <div class="form-grid"><div class="field"><label for="name">Your name</label><input id="name" name="name" type="text" autocomplete="name" required></div><div class="field"><label for="phone">Phone <span data-phone-required>(required)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel" required></div><div class="field field--full"><label for="email">Email <span data-email-required>(optional)</span></label><input id="email" name="email" type="email" autocomplete="email"></div></div>
             <fieldset class="field field--full" style="border:0; padding:0; margin:14px 0 0;">
               <legend style="font-weight:600; margin-bottom:6px;">How should we contact you?</legend>
               <div class="checkbox-grid">
@@ -102,7 +105,7 @@
             <legend>Your routine</legend><div class="form-grid"><div class="field field--full"><label for="frequency">How often would you like your place cleaned?</label><select id="frequency" name="frequency" required><option value="">Choose an option</option><option>One-off clean</option><option>Weekly</option><option>Every two weeks (fortnightly)</option><option>Monthly</option><option>Flexible / other</option></select></div><div class="field"><label for="postcode">Postcode or parish</label><input id="postcode" name="postcode" type="text" autocomplete="postal-code"></div><div class="field field--full"><label for="message">Tell us about your place <span class="form-note">Optional</span></label><textarea id="message" name="message" placeholder="Rooms, anything that needs extra attention, and when you would like to start."></textarea></div></div>
             <div class="photo-field">
               <h3>Photos of the rooms <span class="form-note">Optional</span></h3>
-              <p class="form-note">Pictures say more than a description. Add up to six of the rooms or areas you would like cleaned &mdash; a kitchen, a bathroom, or anything that needs particular attention.</p>
+              <p class="form-note">Pictures say more than a description. Add up to six photos, up to 10MB in total, of the rooms or areas you would like cleaned &mdash; a kitchen, a bathroom, or anything that needs particular attention.</p>
               <label class="photo-add">
                 <input type="file" id="photos" name="photos" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" multiple data-photo-input>
                 <span aria-hidden="true">＋</span> Add photos
@@ -113,7 +116,7 @@
             </div>
           </fieldset>
           <fieldset class="quote-step" data-quote-step hidden>
-            <legend>Check your request</legend><p>Check the details below before you finish.</p><dl class="quote-summary" data-quote-summary></dl><label class="checkbox quote-consent"><input type="checkbox" name="consent" required><span>I am happy for The Aly Touch to use these details to reply to this enquiry.</span></label>
+            <legend>Check your request</legend><p>Check the details below before you finish.</p><dl class="quote-summary" data-quote-summary></dl><label class="checkbox quote-consent"><input type="checkbox" name="consent" required><span>I am happy for The Aly Touch to use these details to reply to this enquiry. Read our <a href="privacy.html">privacy policy</a>.</span></label>
           </fieldset>
           <div class="quote-flow__actions"><button class="btn btn--light" type="button" data-quote-back hidden>Back</button><button class="btn btn--primary" type="button" data-quote-next>Continue</button><button class="btn btn--primary" type="submit" data-quote-submit hidden>Finish my request</button></div>
           <p class="form-status" data-quote-status hidden role="status"></p>
@@ -127,8 +130,8 @@
       <aside>
         <div class="hero__booking">
           <span class="hero__booking-kicker">Prefer to call?</span>
-          <h2>Speak to us directly</h2>
-          <p>If it is easier to explain over the phone, give us a ring.</p>
+          <h2>Speak to Aly directly</h2>
+          <p>If it is easier to explain over the phone, give Aly a ring.</p><p>Already spoken? Use the <a href="https://quote.thealytouch.co.uk/">quick cleaning questionnaire</a> to send your home’s details.</p>
           <a class="hero__booking-phone" data-href="phone" href="tel:07781446239"><span>Call us</span><strong data-site="phone">07781 446239</strong></a>
         </div>
         <div class="card" style="margin-top:20px">
@@ -194,6 +197,6 @@
     </div>
   </div>
 </footer>
-<script src="js/site.js?v=27969091"></script>
+<script src="js/site.js?v=69240a66"></script>
 </body>
 </html>
