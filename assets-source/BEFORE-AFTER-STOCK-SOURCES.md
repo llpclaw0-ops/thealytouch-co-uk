@@ -11,3 +11,9 @@ Bed making & presentation, oven cleaning and hoovering comparisons retain the ex
 New stock photos for fridges, windows, deep cleans, end-of-tenancy and after-builders cleaning were downloaded from Pexels on 7 September 2026. Individual source links, photographers and the Pexels commercial-use licence are recorded on the public image sources page. Holiday lets reuse the licensed bedroom image; limescale removal reuses the generated clean bathroom illustration.
 
 These images are illustrative, not evidence of The Aly Touch customer jobs. This is disclosed beside the comparisons and on the image sources page.
+
+## Stronger service imagery, September 2026 revision 4
+
+Bathroom and skirting comparisons now pair the existing generated clean reference (`after-v2`) with a new deliberately stronger surface-dirt edit (`before-v3`). Geometry and lighting are retained for the comparison; these are illustrative images, not real job photographs. The fridge/cupboard card uses a new generated split composition showing BOTH interiors clean, with no before/after labels.
+
+The holiday-let card uses Pexels photo 14334049 by Augustinus Martinus Noppé (guest bed with towels). The limescale card uses Pexels photo 9462644 by Liliana Drew (detailed basin cleaning). Both have distinct files and source links on image-credits.html, under the Pexels licence. These supersede the two previously reused card images.
