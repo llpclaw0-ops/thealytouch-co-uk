@@ -301,7 +301,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const updateSummary = () => {
       const value = name => (quoteForm.elements[name] && quoteForm.elements[name].value.trim()) || "Not provided";
       const contactMethodValue = () => { const el = quoteForm.querySelector('input[name="contactMethod"]:checked'); return el ? el.value : "Not provided"; };
-      const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Preferred contact method", contactMethodValue()], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
+      const rows = [["Name", value("name")], ["Phone", value("phone")], ["Email", value("email")], ["Preferred contact method", contactMethodValue()], ["Tasks", selectedServices().join(", ") || "Not provided"], ["Frequency", value("frequency")], ["Postcode or parish", value("postcode")], ["Dogs or cats", (quoteForm.querySelector('input[name="pets"]:checked') || {}).value || "Not provided"], ["Photos", photos.length ? `${photos.length} attached` : "None"], ["Notes", value("message")]];
       summary.replaceChildren();
       rows.forEach(([term, detail]) => {
         const row = document.createElement('div');
@@ -326,6 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
       services: "Tasks-selected",
       frequency: "How-often",
       postcode: "Postcode-or-parish",
+      pets: "Dogs-or-cats",
       message: "Tell-us-about-your-place",
       consent: "Agreed-to-be-contacted"
     };

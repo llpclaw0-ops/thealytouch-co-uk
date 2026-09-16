@@ -8,6 +8,7 @@ again.
 ## Everyday room care
 - Floors & work surfaces
 - Bathrooms & shower rooms
+- Hoovering / vacuuming
 - Bed making & presentation — smooth existing bedding and arrange pillows. No stripping beds or changing linen (Lewis confirmed 7 September 2026).
 
 ## Extra jobs (ask for them on any visit)
@@ -16,7 +17,6 @@ again.
 - Windows — inside, and reachable outside
 - Limescale & mould attention
 - Skirtings & polishing
-- Hoovering / vacuuming
 
 ## Bigger one-off jobs
 - Deep / one-off spring clean
