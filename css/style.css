@@ -760,11 +760,11 @@ p:last-child { margin-bottom: 0; }
 .site-footer a:hover { color: #fff; text-decoration: underline; }
 .footer-grid {
   display: grid;
-  grid-template-columns: 1.6fr repeat(3, 1fr);
+  grid-template-columns: 1.6fr repeat(2, 1fr);
   gap: clamp(24px, 3vw, 44px);
 }
-@media (max-width: 900px) { .footer-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 560px) { .footer-grid { grid-template-columns: 1fr; } }
+@media (max-width: 900px) { .footer-grid { grid-template-columns: 1fr 1fr; } .footer-grid > div:first-child { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .footer-grid { gap: 22px; } }
 .footer-bottom {
   display: flex;
   flex-wrap: wrap;
