@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (r.bottom < 0 || r.top > vh) return;
         // -1 when the band's centre is at the top of the screen, +1 at the bottom.
         const t = ((r.top + r.height / 2) - vh / 2) / (vh / 2 + r.height / 2);
-        const room = r.height * 0.22;          // the extra height above and below
+        const room = (layer.offsetHeight - r.height) / 2;   // the extra height above and below
         layer.style.transform = `translate3d(0, ${(-t * room).toFixed(1)}px, 0)`;
       });
       ticking = false;

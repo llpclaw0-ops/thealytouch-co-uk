@@ -1000,8 +1000,11 @@ p:last-child { margin-bottom: 0; }
    on scroll (a slow parallax), and a light ivory wash keeps the copy legible
    on the left where it sits. Reduced-motion users get a still image. */
 .photo-band { position: relative; overflow: hidden; isolation: isolate; }
+.photo-band { --px-extra: 30%; }
+.photo-band--tall { --px-extra: 12%; }
 .photo-band__media {
-  position: absolute; left: 0; right: 0; top: -22%; height: 144%;
+  position: absolute; left: 0; right: 0;
+  top: calc(-1 * var(--px-extra)); height: calc(100% + 2 * var(--px-extra));
   z-index: -1; pointer-events: none;
   background: var(--page-tiny) center / cover no-repeat;
   will-change: transform;
