@@ -26,7 +26,9 @@ again.
 
 ## Explicitly NOT offered
 - Carpets and upholstery cleaning — declined 2026-08-24, do not re-add.
+  Individual stains or spill marks on a carpet or sofa CAN be asked about (Lewis, 16 September 2026: "stains etc should be fine").
 
 ## Pricing
+Lewis, 16 September 2026: "Price depends on the sizes of the locations & quantity. Everything is agreed before work commences."
 Not published. `SITE.rate` in `js/site.js` is deliberately blank; the copy
 around every price block is already written for a figure if one is ever set.
