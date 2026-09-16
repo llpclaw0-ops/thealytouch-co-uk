@@ -165,6 +165,31 @@ document.addEventListener("DOMContentLoaded", () => {
     setPos(50);
   });
 
+  // Slow-scroll photo bands. The picture layer is 44% taller than its band
+  // and slides at a fraction of the scroll speed, so more of the photograph
+  // comes into view as the visitor reads. Nothing moves for reduced-motion.
+  const bands = [...document.querySelectorAll("[data-parallax]")];
+  const stillOnly = window.matchMedia("(prefers-reduced-motion: reduce)");
+  if (bands.length && !stillOnly.matches) {
+    let ticking = false;
+    const place = () => {
+      const vh = window.innerHeight;
+      bands.forEach(layer => {
+        const r = layer.parentElement.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > vh) return;
+        // -1 when the band's centre is at the top of the screen, +1 at the bottom.
+        const t = ((r.top + r.height / 2) - vh / 2) / (vh / 2 + r.height / 2);
+        const room = r.height * 0.22;          // the extra height above and below
+        layer.style.transform = `translate3d(0, ${(-t * room).toFixed(1)}px, 0)`;
+      });
+      ticking = false;
+    };
+    const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(place); } };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    place();
+  }
+
   // Back to top. Built in JS so every page gets it without extra markup.
   const toTop = document.createElement("button");
   toTop.type = "button";
