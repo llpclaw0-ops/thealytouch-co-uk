@@ -25,7 +25,12 @@ for f in glob.glob("*.html"):
     s = open(f).read()
     s = re.sub(r'href="css/style\.css(\?v=[^"]*)?"', f'href="css/style.css?v={css_v}"', s)
     s = re.sub(r'src="js/site\.js(\?v=[^"]*)?"',   f'src="js/site.js?v={js_v}"', s)
-    s, k = IMG.subn(stamp, s)
+    # Preload hints must match the URL the CSS asks for, which is never stamped.
+    lines = s.split("\n"); k = 0
+    for i, line in enumerate(lines):
+        if 'rel="preload"' in line: continue
+        lines[i], c = IMG.subn(stamp, line); k += c
+    s = "\n".join(lines)
     n += k
     open(f, "w").write(s)
 print(f"bumped: css={css_v} js={js_v} images={n}")
