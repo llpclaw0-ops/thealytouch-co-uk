@@ -174,12 +174,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let ticking = false;
     const place = () => {
       const vh = window.innerHeight;
-      bands.forEach(layer => {
-        const r = layer.parentElement.getBoundingClientRect();
+      // Read every measurement first, then write, so the browser lays out once.
+      const seen = bands.map(layer => ({ layer, r: layer.parentElement.getBoundingClientRect(), h: layer.offsetHeight }));
+      seen.forEach(({ layer, r, h }) => {
         if (r.bottom < 0 || r.top > vh) return;
         // -1 when the band's centre is at the top of the screen, +1 at the bottom.
         const t = ((r.top + r.height / 2) - vh / 2) / (vh / 2 + r.height / 2);
-        const room = (layer.offsetHeight - r.height) / 2;   // the extra height above and below
+        const room = (h - r.height) / 2;   // the extra height above and below
         layer.style.transform = `translate3d(0, ${(-t * room).toFixed(1)}px, 0)`;
       });
       ticking = false;

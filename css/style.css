@@ -333,27 +333,6 @@ p:last-child { margin-bottom: 0; }
    the wash near-opaque across the full width and stack to one column. */
 @media (max-width: 900px) {
   .hero__inner { grid-template-columns: 1fr; }
-  /* The full-size hero is ~350KB. Phones and small tablets get the resized
-     copies that already exist in img/sized/. */
-  .hero {
-    background-image:
-      linear-gradient(180deg,
-        rgba(255,250,242,.96) 0%,
-        rgba(255,250,242,.92) 62%,
-        rgba(244,234,223,.72) 100%),
-      url("../img/sized/hero-900.jpg");
-  }
-}
-
-@media (max-width: 560px) {
-  .hero {
-    background-image:
-      linear-gradient(180deg,
-        rgba(255,250,242,.96) 0%,
-        rgba(255,250,242,.92) 62%,
-        rgba(244,234,223,.72) 100%),
-      url("../img/sized/hero-480.jpg");
-  }
 }
 .hero__copy .lede, .hero__lede { color: var(--ink-soft); font-size: 1.12rem; }
 .hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin: 26px 0 0; }
@@ -666,6 +645,8 @@ p:last-child { margin-bottom: 0; }
 }
 .cta-band h2 { color: #fff; }
 .cta-band p { color: rgba(255,255,255,.86); max-width: 60ch; margin-inline: auto; }
+.cta-band p a { color: #fff; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(255,255,255,.55); }
+.cta-band p a:hover { text-decoration-color: #fff; }
 .cta-band .btn-row { justify-content: center; margin-top: 26px; }
 .cta-band .btn--ghost { color: #fff; border-color: rgba(255,255,255,.45); }
 .cta-band .btn--ghost:hover { background: rgba(255,255,255,.10); color: #fff; border-color: #fff; }
